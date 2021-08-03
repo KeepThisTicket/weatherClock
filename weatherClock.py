@@ -19,7 +19,7 @@ temp_array = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
 currentHour = 0
-hourCursor = 0
+hour_cursor = 0
 
 res = requests.get(url)
 data = res.json()
@@ -149,15 +149,14 @@ def get_mouse_click_coor(x, y):
             tomorrowDate = datetime.today() + timedelta(days=1)
             touchedMeridiem = "AM"
         else:
-            touchedMeridiem = "PM"
-    elif (hourTouched >= currentHour):
-        hoursAhead = hourTouched - currentHour
-        touchedMeridiem = currentMeridiem
+            touched_meridiem = "PM"
+    else:
+        hours_ahead = hour_touched - currentHour
+        touched_meridiem = current_meridiem
 
     print("Touched hour is " + str(hoursAhead) + " hours ahead")
 
-    if (mode == 0 and hourTouched != -1):
-        
+    if mode == 0 and hour_touched != -1:
         # go to hourly detail mode
         mode = 1
         # ? to do?: add the button touches for different hours
@@ -174,7 +173,7 @@ def get_mouse_click_coor(x, y):
         weatherText.write("Day", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
 
         weatherText.goto(weatherText_Data, weatherText_vertSpacing*3)
-        if (tomorrow == False):
+        if not tomorrow_date:
             weatherText.write(datetime.today().strftime('%A'),
                               align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
         else:
@@ -253,7 +252,8 @@ def get_mouse_click_coor(x, y):
     cursor_x = -1
     cursor_y = -1
 
-def updateForecast():
+
+def update_forecast():
     
     global hourCursor
 
@@ -263,15 +263,15 @@ def updateForecast():
     print("")
     print("---- updateForecast() ----")
 
-    currentHour = int(time.strftime("%H"))
-    if currentHour > 12:
-        hourCursor = currentHour - 12
+    current_hour = int(time.strftime("%H"))
+    if current_hour > 12:
+        hour_cursor = current_hour - 12
         meridiem = "PM"
-    elif currentHour == 0:
-        hourCursor = 12
+    elif current_hour == 0:
+        hour_cursor = 12
         meridiem = "AM"
     else:
-        hourCursor = currentHour
+        hour_cursor = current_hour
         meridiem = "AM"
         
     print("hourCursor: " + str(hourCursor))
@@ -421,6 +421,8 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     #     pen.goto(0,0)
     #     pen.rt(30)
 
+# draw a clock using the pen i created
+def draw_clock(hour, minute, second, pen):
     pen.hideturtle()
 
     # Draw the hour hand
@@ -475,69 +477,69 @@ while True:
 
     if mode == 0:
         draw_clock(h, m, s, pen)
-        updateForecast()
+        update_forecast()
 
         print("hourCursor: " + str(hourCursor))
 
-        if(1-hourCursor < 0):
-            bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
+        if 1-hour_cursor < 0:
+            bg_hour1.shape(idImage_array[12 - abs(1 - hour_cursor)])
         else:
-            bg_hour1.shape(idImage_array[1-hourCursor])
+            bg_hour1.shape(idImage_array[1 - hour_cursor])
 
-        if(2-hourCursor < 0):
-            bg_hour2.shape(idImage_array[12-abs(2-hourCursor)])
+        if 2-hour_cursor < 0:
+            bg_hour2.shape(idImage_array[12 - abs(2 - hour_cursor)])
         else:
-            bg_hour2.shape(idImage_array[2-hourCursor])
+            bg_hour2.shape(idImage_array[2 - hour_cursor])
 
-        if(3-hourCursor < 0):
-            bg_hour3.shape(idImage_array[12-abs(3-hourCursor)])
+        if 3-hour_cursor < 0:
+            bg_hour3.shape(idImage_array[12 - abs(3 - hour_cursor)])
         else:
-            bg_hour3.shape(idImage_array[3-hourCursor])
-        
-        if(4-hourCursor < 0):
-            bg_hour4.shape(idImage_array[12-abs(4-hourCursor)])
-        else:
-            bg_hour4.shape(idImage_array[4-hourCursor])
+            bg_hour3.shape(idImage_array[3 - hour_cursor])
 
-        if(5-hourCursor < 0):
-            bg_hour5.shape(idImage_array[12-abs(5-hourCursor)])
+        if 4-hour_cursor < 0:
+            bg_hour4.shape(idImage_array[12 - abs(4 - hour_cursor)])
         else:
-            bg_hour5.shape(idImage_array[5-hourCursor])
+            bg_hour4.shape(idImage_array[4 - hour_cursor])
 
-        if(6-hourCursor < 0):
-            bg_hour6.shape(idImage_array[12-abs(6-hourCursor)])
+        if 5-hour_cursor < 0:
+            bg_hour5.shape(idImage_array[12 - abs(5 - hour_cursor)])
         else:
-            bg_hour6.shape(idImage_array[6-hourCursor])
-        
-        if(7-hourCursor < 0):
-            bg_hour7.shape(idImage_array[12-abs(7-hourCursor)])
-        else:
-            bg_hour7.shape(idImage_array[7-hourCursor])
+            bg_hour5.shape(idImage_array[5 - hour_cursor])
 
-        if(8-hourCursor < 0):
-            bg_hour8.shape(idImage_array[12-abs(8-hourCursor)])
+        if 6-hour_cursor < 0:
+            bg_hour6.shape(idImage_array[12 - abs(6 - hour_cursor)])
         else:
-            bg_hour8.shape(idImage_array[8-hourCursor])
+            bg_hour6.shape(idImage_array[6 - hour_cursor])
 
-        if(9-hourCursor < 0):
-            bg_hour9.shape(idImage_array[12-abs(9-hourCursor)])
+        if 7-hour_cursor < 0:
+            bg_hour7.shape(idImage_array[12 - abs(7 - hour_cursor)])
         else:
-            bg_hour9.shape(idImage_array[9-hourCursor])
+            bg_hour7.shape(idImage_array[7 - hour_cursor])
 
-        if(10-hourCursor < 0):
-            bg_hour10.shape(idImage_array[12-abs(10-hourCursor)])
+        if 8-hour_cursor < 0:
+            bg_hour8.shape(idImage_array[12 - abs(8 - hour_cursor)])
         else:
-            bg_hour10.shape(idImage_array[10-hourCursor])
+            bg_hour8.shape(idImage_array[8 - hour_cursor])
 
-        if(11-hourCursor < 0):
-            bg_hour11.shape(idImage_array[12-abs(11-hourCursor)])
+        if 9-hour_cursor < 0:
+            bg_hour9.shape(idImage_array[12 - abs(9 - hour_cursor)])
         else:
-            bg_hour11.shape(idImage_array[11-hourCursor])
+            bg_hour9.shape(idImage_array[9 - hour_cursor])
 
-        if(12-hourCursor < 0):
-            bg_hour12.shape(idImage_array[12-abs(12-hourCursor)])
+        if 10-hour_cursor < 0:
+            bg_hour10.shape(idImage_array[12 - abs(10 - hour_cursor)])
         else:
-            bg_hour12.shape(idImage_array[12-hourCursor])
+            bg_hour10.shape(idImage_array[10 - hour_cursor])
+
+        if 11-hour_cursor < 0:
+            bg_hour11.shape(idImage_array[12 - abs(11 - hour_cursor)])
+        else:
+            bg_hour11.shape(idImage_array[11 - hour_cursor])
+
+        if 12-hour_cursor < 0:
+            bg_hour12.shape(idImage_array[12 - abs(12 - hour_cursor)])
+        else:
+            bg_hour12.shape(idImage_array[12 - hour_cursor])
 
     wn.update()
 
