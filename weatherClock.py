@@ -375,7 +375,7 @@ def draw_clock(hour, minute, second, pen):
     pen.goto(0, 0)
     pen.color("white")
     pen.setheading(90)
-    angle = (h / 12) * 360 + (m/60) * 30
+    angle = (hour / 12) * 360 + (minute/60) * 30
     pen.rt(angle)
     pen.pendown()
     pen.fd(100)
@@ -395,7 +395,7 @@ def draw_clock(hour, minute, second, pen):
     pen.goto(0, 0)
     pen.color("red")
     pen.setheading(90)
-    angle = (s / 60) * 360
+    angle = (second / 60) * 360
     pen.rt(angle)
     pen.pendown()
     pen.fd(75)    
