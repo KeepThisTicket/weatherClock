@@ -114,6 +114,7 @@ def get_mouse_click_coordinate(x, y):
     global cursor_y
     # 0 = clock, 1 = hourly detail
     global mode
+    global hour_cursor
 
     cursor_x = x
     cursor_y = y
