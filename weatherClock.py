@@ -9,7 +9,7 @@ import getopt
 from datetime import datetime, timedelta
 
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
 longitude = -123.1207
@@ -26,6 +26,7 @@ if not api_key:
         options, remaining = getopt.getopt(sys.argv[1:], 'a:l:', ["apikey=", "loglevel="])
         logging.info(f"Remaining arguments will not be used:{remaining}")
         logging.debug(f"Options: {options}")
+        log_level = 'warning'
         for opt, arg in options:
             if opt in ['-a', '--apikey']:
                 api_key = arg
@@ -35,8 +36,16 @@ if not api_key:
                 logging.info(f"Parameter unused: {opt}={arg}")
         if not api_key:
             raise ValueError("Missing -a or --apikey parameter.")
+        if log_level.lower() == 'debug':
+            logging.basicConfig(level=logging.DEBUG)
+        elif log_level.lower() == 'info' or log_level.lower() == 'information':
+            logging.basicConfig(level=logging.INFO)
+        elif log_level.lower() == 'warn' or log_level.lower() == 'warning':
+            logging.basicConfig(level=logging.WARNING)
+        elif log_level.lower() == 'error':
+            logging.basicConfig(level=logging.ERROR)
     except getopt.GetoptError:
-        logging.error('weatherClock.py [-a|--apikey] <YourApiKey>')
+        logging.error('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
 
 
 url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}&units=metric'
