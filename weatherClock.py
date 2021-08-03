@@ -435,7 +435,22 @@ def draw_clock(hour, minute, second, pen):
     pen.pendown()
     pen.fd(75)    
 
-while True:
+
+canvas = wn.getcanvas()
+top_window = canvas.winfo_toplevel()
+running = True
+# wn.onkeypress(fun=exit(), key='q')
+
+
+def on_close():
+    global running
+    running = False
+
+
+top_window.protocol("WM_DELETE_WINDOW", on_close)
+wn.listen()
+
+while running:
     
     logging.info("\n... Main Loop Start ...\n")
 
