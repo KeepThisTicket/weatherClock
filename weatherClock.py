@@ -51,7 +51,11 @@ currentHour = 0
 hour_cursor = 0
 
 res = requests.get(url)
-data = res.json()
+if res.ok:
+    data = res.json()
+else:
+    data = None
+    res.raise_for_status()
 
 logging.debug(data)
 
