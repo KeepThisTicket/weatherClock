@@ -74,8 +74,8 @@ def touch_in_box(touch_x, touch_y, center_x, center_y, size_x, size_y):
     else:
         return False
 
-def get_mouse_click_coor(x, y):
 
+def get_mouse_click_coordinate(x, y):
 
     # when this event is triggered, it means someone pressed the screen, therefore we should check what state we are
     # going into (clock mode, or hourly detail mode)
