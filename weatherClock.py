@@ -2,15 +2,45 @@ import time
 import turtle
 import math
 import requests
+import json
 import logging
+import sys
+import getopt
 from datetime import datetime, timedelta
+
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
-longtitude = -123.1207
+longitude = -123.1207
 
-url = 'http://api.openweathermap.org/data/2.5/onecall?lat=49.2827&lon=-123.1207&exclude=current,minutely,daily,alerts,flags&appid=APIKEYHERE&units=metric'
+api_key = False
+try:
+    with open('settings.json', 'r') as settings:
+        api_key = json.loads(settings.read()).get("ApiKey")
+except FileNotFoundError:
+    logging.info("'settings.json' file not found. Checking command line parameters.")
+
+if not api_key:
+    try:
+        options, remaining = getopt.getopt(sys.argv[1:], 'a:l:', ["apikey=", "loglevel="])
+        logging.info(f"Remaining arguments will not be used:{remaining}")
+        logging.debug(f"Options: {options}")
+        for opt, arg in options:
+            if opt in ['-a', '--apikey']:
+                api_key = arg
+            elif opt in ['-l', '--loglevel']:
+                log_level = arg
+            else:
+                logging.info(f"Parameter unused: {opt}={arg}")
+        if not api_key:
+            raise ValueError("Missing -a or --apikey parameter.")
+    except getopt.GetoptError:
+        logging.error('weatherClock.py [-a|--apikey] <YourApiKey>')
+
+
+url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}&units=metric'
+url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
 weatherUpdatePeriod = 10
 
