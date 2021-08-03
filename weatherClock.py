@@ -2,11 +2,10 @@ import time
 import turtle
 import math
 import requests
-from pprint import pprint
-from pynput.mouse import Listener
-from datetime import datetime
-from datetime import timedelta
+import logging
+from datetime import datetime, timedelta
 
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
 longtitude = -123.1207
@@ -24,7 +23,7 @@ hour_cursor = 0
 res = requests.get(url)
 data = res.json()
 
-print(data)
+logging.debug(data)
 
 cursor_x = 0
 cursor_y = 0
@@ -88,73 +87,53 @@ def get_mouse_click_coor(x, y):
 
     cursor_x = x
     cursor_y = y
-    print("cursor pressed: x, y")
-    print(cursor_x, cursor_y)
+    logging.debug("cursor pressed: x, y")
+    logging.debug(cursor_x, cursor_y)
 
-    currentHour = int(time.strftime("%H"))
-    if currentHour > 12:
-        hourCursor = currentHour - 12
-        currentMeridiem = "PM"
-    elif currentHour == 0:
-        hourCursor = 12
-        currentMeridiem = "AM"
-    else:
-        hourCursor = currentHour
-        currentMeridiem = "AM"
+    hour_cursor = int(time.strftime("%I"))
+    current_meridiem = str(time.strftime('%p'))
 
-    hourTouched = -1
+    hour_touched = -1
 
-    if (touchInBox(cursor_x, cursor_y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 1 WAS TOUCHED !")
-        hourTouched = 1
-    elif (touchInBox(cursor_x, cursor_y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 2 WAS TOUCHED !")
-        hourTouched = 2
-    elif (touchInBox(cursor_x, cursor_y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 3 WAS TOUCHED !")
-        hourTouched = 3
-    elif (touchInBox(cursor_x, cursor_y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 4 WAS TOUCHED !")
-        hourTouched = 4
-    elif (touchInBox(cursor_x, cursor_y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 5 WAS TOUCHED !")
-        hourTouched = 5
-    elif (touchInBox(cursor_x, cursor_y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 6 WAS TOUCHED !")
-        hourTouched = 6
-    elif (touchInBox(cursor_x, cursor_y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 7 WAS TOUCHED !")
-        hourTouched = 7
-    elif (touchInBox(cursor_x, cursor_y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 8 WAS TOUCHED !")
-        hourTouched = 8
-    elif (touchInBox(cursor_x, cursor_y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 9 WAS TOUCHED !")
-        hourTouched = 9
-    elif (touchInBox(cursor_x, cursor_y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 10 WAS TOUCHED !")
-        hourTouched = 10
-    elif (touchInBox(cursor_x, cursor_y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 11 WAS TOUCHED !")
-        hourTouched = 11
-    elif (touchInBox(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 12 WAS TOUCHED !")
-        hourTouched = 12
+    if touch_in_box(cursor_x, cursor_y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 1
+    elif touch_in_box(cursor_x, cursor_y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 2
+    elif touch_in_box(cursor_x, cursor_y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 3
+    elif touch_in_box(cursor_x, cursor_y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 4
+    elif touch_in_box(cursor_x, cursor_y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 5
+    elif touch_in_box(cursor_x, cursor_y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 6
+    elif touch_in_box(cursor_x, cursor_y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 7
+    elif touch_in_box(cursor_x, cursor_y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 8
+    elif touch_in_box(cursor_x, cursor_y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 9
+    elif touch_in_box(cursor_x, cursor_y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 10
+    elif touch_in_box(cursor_x, cursor_y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 11
+    elif touch_in_box(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize):
+        hour_touched = 12
+    logging.debug(f"hour {hour_touched} WAS TOUCHED !")
 
-    tomorrow = False
-    if (hourTouched < currentHour):
-        hoursAhead = 12-currentHour+hourTouched
-        if (currentMeridiem == "PM"):
-            tomorrow = True
-            tomorrowDate = datetime.today() + timedelta(days=1)
-            touchedMeridiem = "AM"
+    tomorrow_date = None
+    if hour_touched < currentHour:
+        hours_ahead = 12-currentHour+hour_touched
+        if current_meridiem == "PM":
+            tomorrow_date = datetime.today() + timedelta(days=1)
+            touched_meridiem = "AM"
         else:
             touched_meridiem = "PM"
     else:
         hours_ahead = hour_touched - currentHour
         touched_meridiem = current_meridiem
 
-    print("Touched hour is " + str(hoursAhead) + " hours ahead")
+    logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
     if mode == 0 and hour_touched != -1:
         # go to hourly detail mode
@@ -255,13 +234,12 @@ def get_mouse_click_coor(x, y):
 
 def update_forecast():
     
-    global hourCursor
+    global hour_cursor
 
     # weather ID breakdown https://openweathermap.org/weather-conditions
     # use https://ezgif.com/maker for gif conversion
 
-    print("")
-    print("---- updateForecast() ----")
+    logging.debug("---- update_forecast() ----")
 
     current_hour = int(time.strftime("%H"))
     if current_hour > 12:
@@ -274,68 +252,56 @@ def update_forecast():
         hour_cursor = current_hour
         meridiem = "AM"
         
-    print("hourCursor: " + str(hourCursor))
+    logging.debug("hour_cursor: " + str(hour_cursor))
 
     for num in range(12):
-        print("")
-        print("current hour: " + time.strftime("%H") + " " + meridiem) # current hour
-        print("forecast hour: " + str(int(time.strftime("%H"))+num)) # forecast hour
-        print("temperature: " + str(data["hourly"][num]["temp"]))
-        print("feels like: " + str(data["hourly"][num]["feels_like"]))
-        print("wind speed: " + str(data["hourly"][num]["wind_speed"]))
-        # pprint(data["hourly"][num]["weather"][0]["description"])
-        print("weather ID: " + str(data["hourly"][num]["weather"][0]["id"]))
-        print("POP: " + str(data["hourly"][num]["pop"]))
+        # current hour
+        logging.debug("current hour: " + time.strftime("%H") + " " + meridiem)
+        # forecast hour
+        logging.debug("forecast hour: " + str(int(time.strftime("%H"))+num))
+        logging.debug("temperature: " + str(data["hourly"][num]["temp"]))
+        logging.debug("feels like: " + str(data["hourly"][num]["feels_like"]))
+        logging.debug("wind speed: " + str(data["hourly"][num]["wind_speed"]))
+        logging.debug(data["hourly"][num]["weather"][0]["description"])
+        logging.debug("weather ID: " + str(data["hourly"][num]["weather"][0]["id"]))
+        logging.debug("POP: " + str(data["hourly"][num]["pop"]))
 
         if 'rain' not in data["hourly"][num]:
-            print("no rain data")
+            logging.debug("no rain data")
         else:
-            print("rain: " + str(data["hourly"][num]["rain"]))
-
-        
+            logging.info("rain: " + str(data["hourly"][num]["rain"]))
 
         temp_array[num] = data["hourly"][num]["temp"]
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
         if id_array[num] >= 200 and id_array[num] <= 232:
-            # do something
             idImage_array[num] = "11d@2x.gif"
         elif id_array[num] >= 300 and id_array[num] <= 321:
-            # do something
             idImage_array[num] = "09d@2x.gif"
         elif id_array[num] >= 500 and id_array[num] <= 504:
-            # do something
             idImage_array[num] = "10d@2x.gif"
         elif id_array[num] == 511:
-            # do someting
             idImage_array[num] = "13d@2x.gif"
         elif id_array[num] >= 520 and id_array[num] <= 531:
-            # do something
             idImage_array[num] = "09d@2x.gif"
         elif id_array[num] >= 600 and id_array[num] <= 622:
-            # do something
             idImage_array[num] = "13d@2x.gif"
         elif id_array[num] >= 701 and id_array[num] <= 781:
-            # do something
             idImage_array[num] = "50d@2x.gif"
         elif id_array[num] == 800:
-            # do something
             idImage_array[num] = "01d@2x.gif"
         elif id_array[num] == 801:
-            # do something
             idImage_array[num] = "02d@2x.gif"
         elif id_array[num] == 802:
-            # do something
             idImage_array[num] = "03d@2x.gif"
         elif id_array[num] == 803 or id_array[num] == 804:
-            # do something
             idImage_array[num] = "04d@2x.gif"
         else:
-            print("Invalid weather ID")
+            logging.error("Invalid weather ID")
 
-    print(temp_array)
-    print(id_array)
-    print(idImage_array)
+    logging.debug(temp_array)
+    logging.debug(id_array)
+    logging.debug(idImage_array)
 
     for image in idImage_array:
         wn.addshape(image)
@@ -399,27 +365,6 @@ bg_hour12.goto(hour12_x, hour12_y)
 s = 0
 # time.sleep(10)
 
-def draw_clock(h, m, s, pen): # draw a clock using the pen i created
-    # Draw the clock face
-    #pen.up()
-    # pen.goto(0, 210)
-    # pen.setheading(180)
-    # pen.color("green")
-    # pen.pendown()
-    # pen.circle(210)
-
-    # Draw lines for the hours
-    # pen.penup()
-    # pen.goto(0,0)
-    # pen.setheading(90)
-
-    # for _ in range(12):
-    #     pen.fd(190)
-    #     pen.pendown()
-    #     pen.fd(20)
-    #     pen.penup()
-    #     pen.goto(0,0)
-    #     pen.rt(30)
 
 # draw a clock using the pen i created
 def draw_clock(hour, minute, second, pen):
@@ -457,29 +402,25 @@ def draw_clock(hour, minute, second, pen):
 
 while True:
     
-    print("")
-    print("... Main Loop Start ... ")
-    print("")
+    logging.info("\n... Main Loop Start ...\n")
 
     h = int(time.strftime("%I"))
     m = int(time.strftime("%M"))
     s = int(time.strftime("%S"))
 
-    print(str(h) + " " + str(m) + " " + str(s))
-    
+    logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
+
     # every x minutes, fetch new weather data
     if m % weatherUpdatePeriod == 0 and s == 0:
         res = requests.get(url)
         data = res.json()
-        print("")
-        print("** FETCHED NEW DATA **")
-        print("")
+        logging.debug("** FETCHED NEW DATA **")
 
     if mode == 0:
         draw_clock(h, m, s, pen)
         update_forecast()
 
-        print("hourCursor: " + str(hourCursor))
+        logging.debug(f"hour_cursor: {str(hour_cursor)}")
 
         if 1-hour_cursor < 0:
             bg_hour1.shape(idImage_array[12 - abs(1 - hour_cursor)])
@@ -544,14 +485,13 @@ while True:
     wn.update()
 
     # cursor / touch logic
-    print("MODE:" + str(mode))
-    print(cursor_x, cursor_y)
-
-        print("screen was touched")
+    # this returns the coordinate of the press !
     turtle.onscreenclick(get_mouse_click_coordinate)
+    logging.debug("MODE:" + str(mode))
+    logging.debug(cursor_x, cursor_y)
 
-    
     if cursor_x != -1 and cursor_y != -1:
+        logging.debug("screen was touched")
 
     time.sleep(1)
 
