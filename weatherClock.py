@@ -23,7 +23,7 @@ except FileNotFoundError:
 
 if not api_key:
     try:
-        options, remaining = getopt.getopt(sys.argv[1:], 'a:l:', ["apikey=", "loglevel="])
+        options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', ["apikey=", "loglevel=", "help"])
         logging.info(f"Remaining arguments will not be used:{remaining}")
         logging.debug(f"Options: {options}")
         log_level = 'warning'
@@ -32,6 +32,8 @@ if not api_key:
                 api_key = arg
             elif opt in ['-l', '--loglevel']:
                 log_level = arg
+            elif opt in ['-h', '--help']:
+                print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
             else:
                 logging.info(f"Parameter unused: {opt}={arg}")
         if not api_key:
