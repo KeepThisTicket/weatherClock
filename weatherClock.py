@@ -274,19 +274,19 @@ def update_forecast():
         temp_array[num] = data["hourly"][num]["temp"]
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
-        if id_array[num] >= 200 and id_array[num] <= 232:
+        if 232 >= id_array[num] >= 200:
             idImage_array[num] = "11d@2x.gif"
-        elif id_array[num] >= 300 and id_array[num] <= 321:
+        elif 321 >= id_array[num] >= 300:
             idImage_array[num] = "09d@2x.gif"
-        elif id_array[num] >= 500 and id_array[num] <= 504:
+        elif 504 >= id_array[num] >= 500:
             idImage_array[num] = "10d@2x.gif"
         elif id_array[num] == 511:
             idImage_array[num] = "13d@2x.gif"
-        elif id_array[num] >= 520 and id_array[num] <= 531:
+        elif 531 >= id_array[num] >= 520:
             idImage_array[num] = "09d@2x.gif"
-        elif id_array[num] >= 600 and id_array[num] <= 622:
+        elif 622 >= id_array[num] >= 600:
             idImage_array[num] = "13d@2x.gif"
-        elif id_array[num] >= 701 and id_array[num] <= 781:
+        elif 781 >= id_array[num] >= 701:
             idImage_array[num] = "50d@2x.gif"
         elif id_array[num] == 800:
             idImage_array[num] = "01d@2x.gif"
