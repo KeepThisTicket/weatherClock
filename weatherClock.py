@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import time
 import turtle
 import math
@@ -5,6 +6,7 @@ import requests
 import json
 import logging
 import sys
+import os
 import getopt
 from datetime import datetime, timedelta
 
@@ -13,6 +15,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
 longitude = -123.1207
+path = os.path.dirname(os.path.realpath(__file__)) + '\\'
 
 api_key = False
 try:
@@ -321,27 +324,27 @@ def update_forecast():
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
         if 232 >= id_array[num] >= 200:
-            idImage_array[num] = "11d@2x.gif"
+            idImage_array[num] = f"{path}11d@2x.gif"
         elif 321 >= id_array[num] >= 300:
-            idImage_array[num] = "09d@2x.gif"
+            idImage_array[num] = f"{path}09d@2x.gif"
         elif 504 >= id_array[num] >= 500:
-            idImage_array[num] = "10d@2x.gif"
+            idImage_array[num] = f"{path}10d@2x.gif"
         elif id_array[num] == 511:
-            idImage_array[num] = "13d@2x.gif"
+            idImage_array[num] = f"{path}13d@2x.gif"
         elif 531 >= id_array[num] >= 520:
-            idImage_array[num] = "09d@2x.gif"
+            idImage_array[num] = f"{path}09d@2x.gif"
         elif 622 >= id_array[num] >= 600:
-            idImage_array[num] = "13d@2x.gif"
+            idImage_array[num] = f"{path}13d@2x.gif"
         elif 781 >= id_array[num] >= 701:
-            idImage_array[num] = "50d@2x.gif"
+            idImage_array[num] = f"{path}50d@2x.gif"
         elif id_array[num] == 800:
-            idImage_array[num] = "01d@2x.gif"
+            idImage_array[num] = f"{path}01d@2x.gif"
         elif id_array[num] == 801:
-            idImage_array[num] = "02d@2x.gif"
+            idImage_array[num] = f"{path}02d@2x.gif"
         elif id_array[num] == 802:
-            idImage_array[num] = "03d@2x.gif"
+            idImage_array[num] = f"{path}03d@2x.gif"
         elif id_array[num] == 803 or id_array[num] == 804:
-            idImage_array[num] = "04d@2x.gif"
+            idImage_array[num] = f"{path}04d@2x.gif"
         else:
             logging.error("Invalid weather ID")
 
