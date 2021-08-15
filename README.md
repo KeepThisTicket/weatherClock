@@ -15,4 +15,5 @@ For any questions/comments - you can open an issue or contact me directly at k3v
 Youtube video showing the clock: https://youtu.be/qGV7r33nt4c
 
 CAD files for enclosure located here: https://cad.onshape.com/documents/a04351220114f9397820b114/w/0854a09a8bd19b8df2167e54/e/af44268ed043f94be60c93c6
+Instructions for setting up the display (go to the "Setting up your Raspberry Pi" section): https://learn.pimoroni.com/tutorial/sandyj/getting-started-with-hyperpixel-4
 
