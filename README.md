@@ -3,6 +3,8 @@
 An digital analog clock but instead of showing the hours, the clock shows the weather at that hour of the day. So instead of showing 1, it will show the weather forecast for 1AM/PM. Click on the hour for more detailed information such as wind, precipitation and more. Once in the detailed view, simply click the center again to return to the analog clock face.
 
 You will need to:
+- install a full Raspbian distribution (not lite)
+- Install python ```pynput``` module. Pynput needs X11 which is on full Raspbian distributions.
 - obtain your own OpenWeatherMap API key from https://openweathermap.org/ and change your location
 - Follow the link below to setup the Pi to display on the Pimoroni screen
 
