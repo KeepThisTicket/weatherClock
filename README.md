@@ -7,7 +7,7 @@ An digital analog clock but instead of showing the hours, the clock shows the we
 You will need to:
 - Acquire Pi Zero W and a Pimoroni 4" touchscreen
 - Install a full Raspbian distribution (not lite)
-- Install python ```pynput``` module. Pynput needs X11 which is on full Raspbian distributions.
+- Install python `pynput` module. Pynput needs X11 which is on full Raspbian distributions.
 - Obtain your own [OpenWeatherMap](https://openweathermap.org/) API key from and change your location to where you are
 - Follow the ["Setting up your Raspberry Pi"](https://learn.pimoroni.com/tutorial/sandyj/getting-started-with-hyperpixel-4) instructions to setup the Pi to push display to the Pimoroni screen
 - Print the two parts of the case (files found in repo). CAD found [here](CAD files for enclosure located [here](https://cad.onshape.com/documents/a04351220114f9397820b114/w/0854a09a8bd19b8df2167e54/e/af44268ed043f94be60c93c6)
@@ -17,4 +17,15 @@ NOTE: I have experienced an issue with running this on the Pi Zero W - after a f
 
 For any questions/comments - you can open an issue or contact me directly at k3vinwu25@gmail.com !
 
+## Requirements
+* python programming language
+* tk windowing toolkit for use with tcl
+* python libraries with e.g. pip: turtle, tk and pynput
 
+After that the script file should run with via `python weatherClock.py`.
+
+## Todo
+* Refactor / Rewrite Code
+* Shell script to set it up on a vanilla raspbian image
+* Parameter setting, e.g. lat/lon, changeable api calls
+* Resolution optimation for different resolutions
