@@ -7,60 +7,6 @@ from pynput.mouse import Listener
 from datetime import datetime
 from datetime import timedelta
 
-latitude = "52.3757341"
-longtitude = "9.7594483"
-api_key = "APIKEY"
-
-url = "http://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,daily,alerts,flags&appid=%s&units=metric" % (latitude, longtitude, api_key)
-
-weatherUpdatePeriod = 30 # update interval for the weather data in minutes
-
-
-temp_array = [0] * 12
-id_array = [0] * 12
-idImage_array = [""] * 12
-currentHour = 0
-hourCursor = 0
-
-data = requests.get(url).json()
-
-#print(data)
-
-cursor_x = 0
-cursor_y = 0
-
-weatherText = turtle.Turtle()
-weatherText.hideturtle()
-weatherText_Description = -30
-weatherText_Data = 30
-weatherText_vertSpacing = 25
-weatherText_DescriptionFontSize = 11
-weatherText_DataFontSize = 10
-
-weatherDividerPen = turtle.Turtle()
-weatherDividerPen.hideturtle()
-
-degree_sign = u"\N{DEGREE SIGN}"
-
-mode = 0 # 1 - hourly detail mode, 0 - analog clock face mode
-
-hourlyTouchSize = 25 # determines radius for user touch when going into hourly detail mode
-
-deg_to_radians = 0.0174533
-radius = 210 # determines how big clock is
-hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
-hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
-hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
-hour4_x, hour4_y = math.cos(-30*deg_to_radians)*radius, math.sin(-30*deg_to_radians)*radius
-hour5_x, hour5_y = math.cos(-60*deg_to_radians)*radius, math.sin(-60*deg_to_radians)*radius
-hour6_x, hour6_y = math.cos(-90*deg_to_radians)*radius, math.sin(-90*deg_to_radians)*radius
-hour7_x, hour7_y = math.cos(-120*deg_to_radians)*radius, math.sin(-120*deg_to_radians)*radius
-hour8_x, hour8_y = math.cos(-150*deg_to_radians)*radius, math.sin(-150*deg_to_radians)*radius
-hour9_x, hour9_y = math.cos(-180*deg_to_radians)*radius, math.sin(-180*deg_to_radians)*radius
-hour10_x, hour10_y = math.cos(-210*deg_to_radians)*radius, math.sin(-210*deg_to_radians)*radius
-hour11_x, hour11_y = math.cos(-240*deg_to_radians)*radius, math.sin(-240*deg_to_radians)*radius
-hour12_x, hour12_y = math.cos(-270*deg_to_radians)*radius, math.sin(-270*deg_to_radians)*radius
-
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(n*multiplier + 0.5) / multiplier
@@ -74,12 +20,33 @@ def touchInBox(touch_x, touch_y, center_x, center_y, size_x, size_y):
 def get_mouse_click_coor(x, y):
 
     # when this event is triggered, it means someone pressed the screen, therefore we should check what state we are going into (clock mode, or hourly detail mode)
-    global cursor_x
-    global cursor_y
     global mode # 0 = clock, 1 = hourly detail
 
-    cursor_x = x
-    cursor_y = y
+    hourTouched = -1
+    if (touchInBox(x, y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 1
+    elif (touchInBox(x, y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 2
+    elif (touchInBox(x, y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 3
+    elif (touchInBox(x, y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 4
+    elif (touchInBox(x, y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 5
+    elif (touchInBox(x, y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 6
+    elif (touchInBox(x, y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 7
+    elif (touchInBox(x, y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 8
+    elif (touchInBox(x, y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 9
+    elif (touchInBox(x, y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 10
+    elif (touchInBox(x, y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 11
+    elif (touchInBox(x, y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
+        hourTouched = 12
 
     currentHour = int(time.strftime("%H"))
     # duplicate to 219
@@ -93,34 +60,8 @@ def get_mouse_click_coor(x, y):
         hourCursor = currentHour
         currentMeridiem = "AM"
 
-    hourTouched = -1
+    print("currentMeridiem %s" % currentMeridiem)
 
-    if (touchInBox(cursor_x, cursor_y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 1
-    elif (touchInBox(cursor_x, cursor_y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 2
-    elif (touchInBox(cursor_x, cursor_y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 3
-    elif (touchInBox(cursor_x, cursor_y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 4
-    elif (touchInBox(cursor_x, cursor_y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 5
-    elif (touchInBox(cursor_x, cursor_y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 6
-    elif (touchInBox(cursor_x, cursor_y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 7
-    elif (touchInBox(cursor_x, cursor_y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 8
-    elif (touchInBox(cursor_x, cursor_y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 9
-    elif (touchInBox(cursor_x, cursor_y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 10
-    elif (touchInBox(cursor_x, cursor_y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 11
-    elif (touchInBox(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
-        hourTouched = 12
-
-    #print("hour %s was toched" % hourTouched)
     tomorrow = False
     if (hourTouched < currentHour):
         hoursAhead = 12-currentHour+hourTouched
@@ -134,6 +75,8 @@ def get_mouse_click_coor(x, y):
         hoursAhead = hourTouched - currentHour
         touchedMeridiem = currentMeridiem
 
+    print("hour %s was toched; we are %s hour ahead and stating %s" % (hourTouched, hoursAhead, touchedMeridiem))
+    
     if (mode == 0 and hourTouched != -1):
         mode = 1 # go to hourly detail mode
         # TODO add the button touches for different hours
@@ -203,27 +146,24 @@ def get_mouse_click_coor(x, y):
         weatherDividerPen.fd(160)
         weatherDividerPen.hideturtle()
 
-    elif (mode == 1 and touchInBox(cursor_x, cursor_y, 0, 0, 200, 200)):
+    elif (mode == 1 and touchInBox(x, y, 0, 0, 200, 200)):
         mode = 0 # go back to clock mode
         weatherText.clear() # remove hourly details from screen
         weatherDividerPen.clear()
 
-    cursor_x = -1
-    cursor_y = -1
+def updateForecast(): 
+    temp_array = [0] * 12
+    id_array = [0] * 12
+    idImage_array = [""] * 12
 
-def updateForecast():    
-    global hourCursor
-
+    hourCursor = 0
     currentHour = int(time.strftime("%H"))
     if currentHour > 12:
         hourCursor = currentHour - 12
-        meridiem = "PM"
     elif currentHour == 0:
         hourCursor = 12
-        meridiem = "AM"
     else:
         hourCursor = currentHour
-        meridiem = "AM"
         
     for num in range(12):
         temp_array[num] = data["hourly"][num]["temp"]
@@ -258,6 +198,85 @@ def updateForecast():
 
     for image in idImage_array:
         wn.addshape(image)
+
+    return hourCursor, idImage_array
+
+def draw_clock(h, m, s, pen): # draw a clock using the pen i created
+    pen.hideturtle()
+
+    # Draw the hour hand
+    pen.penup()
+    pen.goto(0,0)
+    pen.color("white")
+    pen.setheading(90)
+    angle = (h / 12) * 360 + (m/60) * 30
+    pen.rt(angle)
+    pen.pendown()
+    pen.fd(100)
+
+    # Draw the minute hand
+    pen.penup()
+    pen.goto(0,0)
+    pen.color("white")
+    pen.setheading(90)
+    angle = (m / 60) * 360
+    pen.rt(angle)
+    pen.pendown()
+    pen.fd(170)
+
+    # Draw the second hand
+    pen.penup()
+    pen.goto(0,0)
+    pen.color("red")
+    pen.setheading(90)
+    angle = (s / 60) * 360
+    pen.rt(angle)
+    pen.pendown()
+    pen.fd(75)    
+
+latitude = "52.3757341"
+longtitude = "9.7594483"
+api_key = "APIKEY"
+
+url = "http://api.openweathermap.org/data/2.5/onecall?lat=%s&lon=%s&exclude=current,minutely,daily,alerts,flags&appid=%s&units=metric" % (latitude, longtitude, api_key)
+
+weatherUpdatePeriod = 30 # update interval for the weather data in minutes
+
+data = requests.get(url).json()
+
+#print(data)
+
+weatherText = turtle.Turtle()
+weatherText.hideturtle()
+weatherText_Description = -30
+weatherText_Data = 30
+weatherText_vertSpacing = 25
+weatherText_DescriptionFontSize = 11
+weatherText_DataFontSize = 10
+
+weatherDividerPen = turtle.Turtle()
+weatherDividerPen.hideturtle()
+
+degree_sign = u"\N{DEGREE SIGN}"
+
+mode = 0 # 1 - hourly detail mode, 0 - analog clock face mode
+
+hourlyTouchSize = 25 # determines radius for user touch when going into hourly detail mode
+
+deg_to_radians = 0.0174533
+radius = 210 # determines how big clock is
+hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
+hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
+hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
+hour4_x, hour4_y = math.cos(-30*deg_to_radians)*radius, math.sin(-30*deg_to_radians)*radius
+hour5_x, hour5_y = math.cos(-60*deg_to_radians)*radius, math.sin(-60*deg_to_radians)*radius
+hour6_x, hour6_y = math.cos(-90*deg_to_radians)*radius, math.sin(-90*deg_to_radians)*radius
+hour7_x, hour7_y = math.cos(-120*deg_to_radians)*radius, math.sin(-120*deg_to_radians)*radius
+hour8_x, hour8_y = math.cos(-150*deg_to_radians)*radius, math.sin(-150*deg_to_radians)*radius
+hour9_x, hour9_y = math.cos(-180*deg_to_radians)*radius, math.sin(-180*deg_to_radians)*radius
+hour10_x, hour10_y = math.cos(-210*deg_to_radians)*radius, math.sin(-210*deg_to_radians)*radius
+hour11_x, hour11_y = math.cos(-240*deg_to_radians)*radius, math.sin(-240*deg_to_radians)*radius
+hour12_x, hour12_y = math.cos(-270*deg_to_radians)*radius, math.sin(-270*deg_to_radians)*radius
 
 wn = turtle.Screen()
 wn.bgcolor("black")
@@ -313,52 +332,19 @@ bg_hour12.goto(hour12_x, hour12_y)
 
 s = 0
 
-def draw_clock(h, m, s, pen): # draw a clock using the pen i created
-    pen.hideturtle()
-
-    # Draw the hour hand
-    pen.penup()
-    pen.goto(0,0)
-    pen.color("white")
-    pen.setheading(90)
-    angle = (h / 12) * 360 + (m/60) * 30
-    pen.rt(angle)
-    pen.pendown()
-    pen.fd(100)
-
-    # Draw the minute hand
-    pen.penup()
-    pen.goto(0,0)
-    pen.color("white")
-    pen.setheading(90)
-    angle = (m / 60) * 360
-    pen.rt(angle)
-    pen.pendown()
-    pen.fd(170)
-
-    # Draw the second hand
-    pen.penup()
-    pen.goto(0,0)
-    pen.color("red")
-    pen.setheading(90)
-    angle = (s / 60) * 360
-    pen.rt(angle)
-    pen.pendown()
-    pen.fd(75)    
-
-# main script code
 while True:
 
     h = int(time.strftime("%I"))
     m = int(time.strftime("%M"))
     s = int(time.strftime("%S"))
+    hourCursor = 0
 
     if (m % weatherUpdatePeriod == 0 and s == 0):
-        data = requests.get(url).res.json()
+        data = requests.get(url).json()
 
     if (mode == 0):
         draw_clock(h, m, s, pen)
-        updateForecast()
+        hourCursor, idImage_array = updateForecast()
 
         if(1-hourCursor < 0):
             bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
