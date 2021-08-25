@@ -27,6 +27,7 @@ try:
     log_level = False
     latitude = False
     longitude = False
+    units = False
     for opt, arg in options:
         if opt in ['-a', '--apikey']:
             api_key = arg
@@ -36,6 +37,11 @@ try:
             latitude = arg
         elif opt in ['-s', '--longitude']:
             longitude = arg
+        elif opt in ['-u', '--units']:
+            if arg.lower() in ['metric', 'imperial']:
+                units = arg
+            else:
+                raise ValueError("[-u|--units] must be one of: metric, imperial")
         elif opt in ['-h', '--help']:
             print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
             exit(0)
@@ -57,6 +63,8 @@ try:
             latitude = settings.get('Latitude')
         if not longitude:
             longitude = settings.get('Longitude')
+        if not units:
+            units = settings.get('Units')
 except FileNotFoundError:
     print("'settings.json' file not found. Using command line parameters.")
 
@@ -76,7 +84,11 @@ else:
     raise ValueError("LogLevel (--loglevel) must be one of: [Debug|Info|Information|Warn|Warning|Error]")
 
 
-url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}&units=metric'
+url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}'
+if units:
+    url_params += f"&units={units}"
+else:
+    logging.info(f"Units not set. OpenWeatherMap.org defaults to 'standard'.")
 url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
 weatherUpdatePeriod = 10
