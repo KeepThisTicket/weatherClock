@@ -236,7 +236,7 @@ def get_mouse_click_coordinate(x, y):
         weatherText.goto(weatherText_Data, weatherText_vertSpacing)
         weatherText.write(str(round_half_up(data["hourly"][hours_ahead]["temp"], 1)) + degree_sign,
                           align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
-        
+
         # Feels like
         weatherText.goto(weatherText_Description, 0)
         weatherText.write("Feels like", align="right",
@@ -295,7 +295,7 @@ def get_mouse_click_coordinate(x, y):
 
 
 def update_forecast():
-    
+
     global hour_cursor
 
     # weather ID breakdown https://openweathermap.org/weather-conditions
@@ -313,7 +313,7 @@ def update_forecast():
     else:
         hour_cursor = current_hour
         meridiem = "AM"
-        
+
     logging.debug("hour_cursor: " + str(hour_cursor))
 
     for num in range(12):
@@ -460,7 +460,7 @@ def draw_clock(hour, minute, second, pen):
     angle = (second / 60) * 360
     pen.rt(angle)
     pen.pendown()
-    pen.fd(75)    
+    pen.fd(75)
 
 
 canvas = wn.getcanvas()
@@ -478,7 +478,7 @@ top_window.protocol("WM_DELETE_WINDOW", on_close)
 wn.listen()
 
 while running:
-    
+
     logging.info("\n... Main Loop Start ...\n")
 
     h = int(time.strftime("%I"))
