@@ -24,17 +24,17 @@ try:
         logging.warning(f"Remaining arguments will not be used:{remaining}")
     logging.info(f"Options: {options}")
     api_key = False
-    log_level = 'warning'
+    log_level = False
     for opt, arg in options:
         if opt in ['-a', '--apikey']:
             api_key = arg
-        elif opt in ['-l', '--loglevel']:
+        if opt in ['-l', '--loglevel']:
             log_level = arg
-        elif opt in ['-h', '--help']:
+        if opt in ['-h', '--help']:
             print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
             exit(0)
-        else:
             logging.warning(f"Parameter unused: {opt}={arg}")
+        if opt not in ['-a', '--apikey', '-l', '--loglevel', '-h', '--help']:
 except getopt.GetoptError:
     logging.error('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
     raise ValueError("Missing one or more parameters.")
