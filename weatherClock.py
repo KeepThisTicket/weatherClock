@@ -11,18 +11,19 @@ import getopt
 from datetime import datetime, timedelta
 
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
 longitude = -123.1207
 path = os.path.dirname(os.path.realpath(__file__)) + '\\'
 
 
+print("Starting WeatherClock...")
 try:
     options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', ["apikey=", "loglevel=", "help"])
     if remaining:
-        logging.warning(f"Remaining arguments will not be used:{remaining}")
-    logging.info(f"Options: {options}")
+        print(f"Remaining arguments will not be used:{remaining}")
+    if options:
+        print(f"Options: {options}")
     api_key = False
     log_level = False
     for opt, arg in options:
@@ -33,10 +34,10 @@ try:
         if opt in ['-h', '--help']:
             print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
             exit(0)
-            logging.warning(f"Parameter unused: {opt}={arg}")
         if opt not in ['-a', '--apikey', '-l', '--loglevel', '-h', '--help']:
+            print(f"Parameter unused: {opt}={arg}")
 except getopt.GetoptError:
-    logging.error('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
+    print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
     raise ValueError("Missing one or more parameters.")
 
 try:
@@ -48,19 +49,19 @@ try:
         if not log_level:
             log_level = settings.get('LogLevel')
 except FileNotFoundError:
-    logging.info("'settings.json' file not found. Checking command line parameters.")
+    print("'settings.json' file not found. Using command line parameters.")
 
 if not api_key:
     raise ValueError("No ApiKey given. Use ApiKey in settings.json or use parameter: [-a|--apikey].")
 
 if log_level.lower() == 'debug':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 elif log_level.lower() == 'info' or log_level.lower() == 'information':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 elif log_level.lower() == 'warn' or log_level.lower() == 'warning':
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 elif log_level.lower() == 'error':
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
 else:
     logging.error(f"Log Level set to invalid value: {log_level}")
     raise ValueError("LogLevel (--loglevel) must be one of: [Debug|Info|Information|Warn|Warning|Error]")
@@ -479,7 +480,7 @@ wn.listen()
 
 while running:
 
-    logging.info("\n... Main Loop Start ...\n")
+    logging.debug("\n... Main Loop Start ...\n")
 
     h = int(time.strftime("%I"))
     m = int(time.strftime("%M"))
