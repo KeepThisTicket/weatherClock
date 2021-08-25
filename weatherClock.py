@@ -43,7 +43,8 @@ try:
     with open('settings.json', 'r') as settings_json:
         settings = json.loads(settings_json.read())
         if not api_key:
-            api_key = settings.get('ApiKey')
+            api_key_setting = settings.get('ApiKey')
+            api_key = api_key_setting if api_key_setting else False
         if not log_level:
             log_level = settings.get('LogLevel')
 except FileNotFoundError:
