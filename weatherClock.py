@@ -479,101 +479,106 @@ top_window.protocol("WM_DELETE_WINDOW", on_close)
 wn.listen()
 
 while running:
+    try:
+        logging.debug("\n... Main Loop Start ...\n")
 
-    logging.debug("\n... Main Loop Start ...\n")
+        h = int(time.strftime("%I"))
+        m = int(time.strftime("%M"))
+        s = int(time.strftime("%S"))
 
-    h = int(time.strftime("%I"))
-    m = int(time.strftime("%M"))
-    s = int(time.strftime("%S"))
+        logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
 
-    logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
+        # every x minutes, fetch new weather data
+        if m % weatherUpdatePeriod == 0 and s == 0:
+            res = requests.get(url)
+            data = res.json()
+            logging.debug("** FETCHED NEW DATA **")
 
-    # every x minutes, fetch new weather data
-    if m % weatherUpdatePeriod == 0 and s == 0:
-        res = requests.get(url)
-        data = res.json()
-        logging.debug("** FETCHED NEW DATA **")
+        if mode == 0:
+            draw_clock(h, m, s, pen)
+            update_forecast()
 
-    if mode == 0:
-        draw_clock(h, m, s, pen)
-        update_forecast()
+            logging.debug(f"hour_cursor: {str(hour_cursor)}")
 
-        logging.debug(f"hour_cursor: {str(hour_cursor)}")
+            if 1-hour_cursor < 0:
+                bg_hour1.shape(idImage_array[12 - abs(1 - hour_cursor)])
+            else:
+                bg_hour1.shape(idImage_array[1 - hour_cursor])
 
-        if 1-hour_cursor < 0:
-            bg_hour1.shape(idImage_array[12 - abs(1 - hour_cursor)])
-        else:
-            bg_hour1.shape(idImage_array[1 - hour_cursor])
+            if 2-hour_cursor < 0:
+                bg_hour2.shape(idImage_array[12 - abs(2 - hour_cursor)])
+            else:
+                bg_hour2.shape(idImage_array[2 - hour_cursor])
 
-        if 2-hour_cursor < 0:
-            bg_hour2.shape(idImage_array[12 - abs(2 - hour_cursor)])
-        else:
-            bg_hour2.shape(idImage_array[2 - hour_cursor])
+            if 3-hour_cursor < 0:
+                bg_hour3.shape(idImage_array[12 - abs(3 - hour_cursor)])
+            else:
+                bg_hour3.shape(idImage_array[3 - hour_cursor])
 
-        if 3-hour_cursor < 0:
-            bg_hour3.shape(idImage_array[12 - abs(3 - hour_cursor)])
-        else:
-            bg_hour3.shape(idImage_array[3 - hour_cursor])
+            if 4-hour_cursor < 0:
+                bg_hour4.shape(idImage_array[12 - abs(4 - hour_cursor)])
+            else:
+                bg_hour4.shape(idImage_array[4 - hour_cursor])
 
-        if 4-hour_cursor < 0:
-            bg_hour4.shape(idImage_array[12 - abs(4 - hour_cursor)])
-        else:
-            bg_hour4.shape(idImage_array[4 - hour_cursor])
+            if 5-hour_cursor < 0:
+                bg_hour5.shape(idImage_array[12 - abs(5 - hour_cursor)])
+            else:
+                bg_hour5.shape(idImage_array[5 - hour_cursor])
 
-        if 5-hour_cursor < 0:
-            bg_hour5.shape(idImage_array[12 - abs(5 - hour_cursor)])
-        else:
-            bg_hour5.shape(idImage_array[5 - hour_cursor])
+            if 6-hour_cursor < 0:
+                bg_hour6.shape(idImage_array[12 - abs(6 - hour_cursor)])
+            else:
+                bg_hour6.shape(idImage_array[6 - hour_cursor])
 
-        if 6-hour_cursor < 0:
-            bg_hour6.shape(idImage_array[12 - abs(6 - hour_cursor)])
-        else:
-            bg_hour6.shape(idImage_array[6 - hour_cursor])
+            if 7-hour_cursor < 0:
+                bg_hour7.shape(idImage_array[12 - abs(7 - hour_cursor)])
+            else:
+                bg_hour7.shape(idImage_array[7 - hour_cursor])
 
-        if 7-hour_cursor < 0:
-            bg_hour7.shape(idImage_array[12 - abs(7 - hour_cursor)])
-        else:
-            bg_hour7.shape(idImage_array[7 - hour_cursor])
+            if 8-hour_cursor < 0:
+                bg_hour8.shape(idImage_array[12 - abs(8 - hour_cursor)])
+            else:
+                bg_hour8.shape(idImage_array[8 - hour_cursor])
 
-        if 8-hour_cursor < 0:
-            bg_hour8.shape(idImage_array[12 - abs(8 - hour_cursor)])
-        else:
-            bg_hour8.shape(idImage_array[8 - hour_cursor])
+            if 9-hour_cursor < 0:
+                bg_hour9.shape(idImage_array[12 - abs(9 - hour_cursor)])
+            else:
+                bg_hour9.shape(idImage_array[9 - hour_cursor])
 
-        if 9-hour_cursor < 0:
-            bg_hour9.shape(idImage_array[12 - abs(9 - hour_cursor)])
-        else:
-            bg_hour9.shape(idImage_array[9 - hour_cursor])
+            if 10-hour_cursor < 0:
+                bg_hour10.shape(idImage_array[12 - abs(10 - hour_cursor)])
+            else:
+                bg_hour10.shape(idImage_array[10 - hour_cursor])
 
-        if 10-hour_cursor < 0:
-            bg_hour10.shape(idImage_array[12 - abs(10 - hour_cursor)])
-        else:
-            bg_hour10.shape(idImage_array[10 - hour_cursor])
+            if 11-hour_cursor < 0:
+                bg_hour11.shape(idImage_array[12 - abs(11 - hour_cursor)])
+            else:
+                bg_hour11.shape(idImage_array[11 - hour_cursor])
 
-        if 11-hour_cursor < 0:
-            bg_hour11.shape(idImage_array[12 - abs(11 - hour_cursor)])
-        else:
-            bg_hour11.shape(idImage_array[11 - hour_cursor])
+            if 12-hour_cursor < 0:
+                bg_hour12.shape(idImage_array[12 - abs(12 - hour_cursor)])
+            else:
+                bg_hour12.shape(idImage_array[12 - hour_cursor])
 
-        if 12-hour_cursor < 0:
-            bg_hour12.shape(idImage_array[12 - abs(12 - hour_cursor)])
-        else:
-            bg_hour12.shape(idImage_array[12 - hour_cursor])
+        wn.update()
 
-    wn.update()
+        # cursor / touch logic
+        # this returns the coordinate of the press !
+        turtle.onscreenclick(get_mouse_click_coordinate)
+        logging.debug("MODE:" + str(mode))
+        logging.debug(cursor_x, cursor_y)
 
-    # cursor / touch logic
-    # this returns the coordinate of the press !
-    turtle.onscreenclick(get_mouse_click_coordinate)
-    logging.debug("MODE:" + str(mode))
-    logging.debug(cursor_x, cursor_y)
+        if cursor_x != -1 and cursor_y != -1:
+            logging.debug("screen was touched")
 
-    if cursor_x != -1 and cursor_y != -1:
-        logging.debug("screen was touched")
+        time.sleep(1)
 
-    time.sleep(1)
+        pen.clear()
 
-    pen.clear()
+    except KeyboardInterrupt:
+        print("Exiting WeatherClock.")
+        exit(0)
 
 # if you don't do this, window will open and close immediately, should be the last line of your program
-# wn.mainloop()
+# this line is technically unreachable code since the above while loop also closes the script.
+wn.mainloop()
