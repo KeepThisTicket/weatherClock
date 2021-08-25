@@ -12,29 +12,34 @@ from datetime import datetime, timedelta
 
 
 # currently set to Vancouver, BC CANADA
-latitude = 49.2827
-longitude = -123.1207
 path = os.path.dirname(os.path.realpath(__file__)) + '\\'
 
 
 print("Starting WeatherClock...")
 try:
-    options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', ["apikey=", "loglevel=", "help"])
+    options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', [
+        "apikey=", "loglevel=", "latitude=", "longitude=" "help"])
     if remaining:
         print(f"Remaining arguments will not be used:{remaining}")
     if options:
         print(f"Options: {options}")
     api_key = False
     log_level = False
+    latitude = False
+    longitude = False
     for opt, arg in options:
         if opt in ['-a', '--apikey']:
             api_key = arg
-        if opt in ['-l', '--loglevel']:
+        elif opt in ['-l', '--loglevel']:
             log_level = arg
-        if opt in ['-h', '--help']:
+        elif opt in ['-n', '--latitude']:
+            latitude = arg
+        elif opt in ['-s', '--longitude']:
+            longitude = arg
+        elif opt in ['-h', '--help']:
             print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
             exit(0)
-        if opt not in ['-a', '--apikey', '-l', '--loglevel', '-h', '--help']:
+        else:
             print(f"Parameter unused: {opt}={arg}")
 except getopt.GetoptError:
     print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
@@ -48,6 +53,10 @@ try:
             api_key = api_key_setting if api_key_setting else False
         if not log_level:
             log_level = settings.get('LogLevel')
+        if not latitude:
+            latitude = settings.get('Latitude')
+        if not longitude:
+            longitude = settings.get('Longitude')
 except FileNotFoundError:
     print("'settings.json' file not found. Using command line parameters.")
 
