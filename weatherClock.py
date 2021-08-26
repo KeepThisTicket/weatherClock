@@ -17,6 +17,11 @@ def touchInBox(touch_x, touch_y, center_x, center_y, size_x, size_y):
     else:
         return False
 
+def switch_meridiem(currentMeridiem):
+    if (currentMeridiem == "AM"):
+        return "PM"
+    return "AM"
+
 def get_mouse_click_coor(x, y):
 
     # when this event is triggered, it means someone pressed the screen, therefore we should check what state we are going into (clock mode, or hourly detail mode)
@@ -48,38 +53,30 @@ def get_mouse_click_coor(x, y):
     elif (touchInBox(x, y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
         hourTouched = 12
 
-    currentHour = int(time.strftime("%H"))
-    # duplicate to 219
-    if currentHour > 12:
-        hourCursor = currentHour - 12
-        currentMeridiem = "PM"
-    elif currentHour == 0:
-        hourCursor = 12
-        currentMeridiem = "AM"
-    else:
-        hourCursor = currentHour
-        currentMeridiem = "AM"
-
-    print("currentMeridiem %s" % currentMeridiem)
-
-    tomorrow = False
-    if (hourTouched < currentHour):
-        hoursAhead = 12-currentHour+hourTouched
-        if (currentMeridiem == "PM"):
-            tomorrow = True
-            tomorrowDate = datetime.today() + timedelta(days=1)
-            touchedMeridiem = "AM"
-        else:
-            touchedMeridiem = "PM"
-    elif (hourTouched >= currentHour):
-        hoursAhead = hourTouched - currentHour
-        touchedMeridiem = currentMeridiem
-
-    print("hour %s was toched; we are %s hour ahead and stating %s" % (hourTouched, hoursAhead, touchedMeridiem))
+    currentHour = int(time.strftime("%I"))
+    currentMeridiem = time.strftime("%p")
     
+    #print("currentMeridiem %s" % currentMeridiem)
+
+    tomorrow = False        
+    if (hourTouched < currentHour): # touched_hour < current_hour = other meridiam
+        hoursAhead = 12 - currentHour + hourTouched
+        touchedMeridiem = switch_meridiem(currentMeridiem)
+    elif (hourTouched >= currentHour): # touched_hour >= current_hour = same meridiam
+        hoursAhead = hourTouched - currentHour
+        if (hourTouched == 12): # touching 12, there change meridiam
+            touchedMeridiem = switch_meridiem(currentMeridiem)
+        else:
+            touchedMeridiem = currentMeridiem
+    if (currentMeridiem == "PM" and touchedMeridiem == "AM"):
+        tomorrow = True
+        tomorrowDate = datetime.today() + timedelta(days=1)
+
+    #print("hour %s was toched; from %s we are %s hour ahead and stating %s" % (hourTouched, currentHour, hoursAhead, touchedMeridiem))
+    #print(data["hourly"][hoursAhead])
+
     if (mode == 0 and hourTouched != -1):
         mode = 1 # go to hourly detail mode
-        # TODO add the button touches for different hours
         
         pen.clear() # remove the clock hands from showing
 
