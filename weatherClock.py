@@ -95,7 +95,7 @@ weatherUpdatePeriod = 10
 temp_array = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
-currentHour = 0
+current_hour = 0
 hour_cursor = 0
 
 res = requests.get(url)
@@ -205,15 +205,15 @@ def get_mouse_click_coordinate(x, y):
     logging.debug(f"hour {hour_touched} WAS TOUCHED !")
 
     tomorrow_date = None
-    if hour_touched < currentHour:
-        hours_ahead = 12-currentHour+hour_touched
+    if hour_touched < current_hour:
+        hours_ahead = 12-current_hour+hour_touched
         if current_meridiem == "PM":
             tomorrow_date = datetime.today() + timedelta(days=1)
             touched_meridiem = "AM"
         else:
             touched_meridiem = "PM"
     else:
-        hours_ahead = hour_touched - currentHour
+        hours_ahead = hour_touched - current_hour
         touched_meridiem = current_meridiem
 
     logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
