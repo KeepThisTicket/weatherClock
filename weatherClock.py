@@ -22,6 +22,39 @@ def switch_meridiem(currentMeridiem):
         return "PM"
     return "AM"
 
+def determine_weather_pictogram(weather_id):
+    # weather ID breakdown https://openweathermap.org/weather-conditions
+    # use https://ezgif.com/maker for gif conversion
+    if weather_id >= 200 and weather_id <= 232:
+        return "11d@2x.gif"
+    elif weather_id >= 300 and weather_id <= 321:
+        return "09d@2x.gif"
+    elif weather_id >= 500 and weather_id <= 504:
+        return "10d@2x.gif"
+    elif weather_id == 511:
+        return "13d@2x.gif"
+    elif weather_id >= 520 and weather_id <= 531:
+        return "09d@2x.gif"
+    elif weather_id >= 600 and weather_id <= 622:
+        return "13d@2x.gif"
+    elif weather_id >= 701 and weather_id <= 781:
+        return "50d@2x.gif"
+    elif weather_id == 800:
+        return "01d@2x.gif"
+    elif weather_id == 801:
+        return "02d@2x.gif"
+    elif weather_id == 802:
+        return "03d@2x.gif"
+    elif weather_id == 803 or weather_id == 804:
+        return "04d@2x.gif"
+
+    print("Invalid weather ID")
+
+def determine_hour_index(current_hour, num):
+    if (current_hour + num) > 12:
+        return current_hour + num - 13
+    return current_hour + num - 1
+
 def get_mouse_click_coor(x, y):
 
     # when this event is triggered, it means someone pressed the screen, therefore we should check what state we are going into (clock mode, or hourly detail mode)
@@ -53,17 +86,17 @@ def get_mouse_click_coor(x, y):
     elif (touchInBox(x, y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
         hourTouched = 12
 
-    currentHour = int(time.strftime("%I"))
+    current_hour = int(time.strftime("%I"))
     currentMeridiem = time.strftime("%p")
     
     #print("currentMeridiem %s" % currentMeridiem)
 
     tomorrow = False        
-    if (hourTouched < currentHour): # touched_hour < current_hour = other meridiam
-        hoursAhead = 12 - currentHour + hourTouched
+    if (hourTouched < current_hour): # touched_hour < current_hour = other meridiam
+        hoursAhead = 12 - current_hour + hourTouched
         touchedMeridiem = switch_meridiem(currentMeridiem)
-    elif (hourTouched >= currentHour): # touched_hour >= current_hour = same meridiam
-        hoursAhead = hourTouched - currentHour
+    elif (hourTouched >= current_hour): # touched_hour >= current_hour = same meridiam
+        hoursAhead = hourTouched - current_hour
         if (hourTouched == 12): # touching 12, there change meridiam
             touchedMeridiem = switch_meridiem(currentMeridiem)
         else:
@@ -72,7 +105,7 @@ def get_mouse_click_coor(x, y):
         tomorrow = True
         tomorrowDate = datetime.today() + timedelta(days=1)
 
-    #print("hour %s was toched; from %s we are %s hour ahead and stating %s" % (hourTouched, currentHour, hoursAhead, touchedMeridiem))
+    #print("hour %s was toched; from %s we are %s hour ahead and stating %s" % (hourTouched, current_hour, hoursAhead, touchedMeridiem))
     #print(data["hourly"][hoursAhead])
 
     if (mode == 0 and hourTouched != -1):
@@ -111,7 +144,7 @@ def get_mouse_click_coor(x, y):
         weatherText.write(str(round_half_up(data["hourly"][hoursAhead]["feels_like"], 1)) + degree_sign, align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
         weatherText.goto(weatherText_Description, -weatherText_vertSpacing)
-        weatherText.write("POP", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # POP
+        weatherText.write("POP", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # POP (Probability of precipitation)
 
         weatherText.goto(weatherText_Data, -weatherText_vertSpacing)
         weatherText.write(str(int(data["hourly"][hoursAhead]["pop"]*100)) + " %", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
@@ -148,50 +181,23 @@ def get_mouse_click_coor(x, y):
         weatherText.clear() # remove hourly details from screen
         weatherDividerPen.clear()
 
-def updateForecast(): 
-    temp_array = [0] * 12
-    id_array = [0] * 12
+def update_forecast(data): 
     idImage_array = [""] * 12
 
     hourCursor = 0
-    currentHour = int(time.strftime("%H"))
-    if currentHour > 12:
-        hourCursor = currentHour - 12
-    elif currentHour == 0:
+    current_hour = int(time.strftime("%H"))
+    if current_hour > 12:
+        hourCursor = current_hour - 12
+    elif current_hour == 0:
         hourCursor = 12
     else:
-        hourCursor = currentHour
+        hourCursor = current_hour
         
     for num in range(12):
-        temp_array[num] = data["hourly"][num]["temp"]
-        id_array[num] = data["hourly"][num]["weather"][0]["id"]
+        weather_id = data["hourly"][num]["weather"][0]["id"]
+        hour_index = determine_hour_index(hourCursor, num)
 
-        # weather ID breakdown https://openweathermap.org/weather-conditions
-        # use https://ezgif.com/maker for gif conversion
-        if id_array[num] >= 200 and id_array[num] <= 232:
-            idImage_array[num] = "11d@2x.gif"
-        elif id_array[num] >= 300 and id_array[num] <= 321:
-            idImage_array[num] = "09d@2x.gif"
-        elif id_array[num] >= 500 and id_array[num] <= 504:
-            idImage_array[num] = "10d@2x.gif"
-        elif id_array[num] == 511:
-            idImage_array[num] = "13d@2x.gif"
-        elif id_array[num] >= 520 and id_array[num] <= 531:
-            idImage_array[num] = "09d@2x.gif"
-        elif id_array[num] >= 600 and id_array[num] <= 622:
-            idImage_array[num] = "13d@2x.gif"
-        elif id_array[num] >= 701 and id_array[num] <= 781:
-            idImage_array[num] = "50d@2x.gif"
-        elif id_array[num] == 800:
-            idImage_array[num] = "01d@2x.gif"
-        elif id_array[num] == 801:
-            idImage_array[num] = "02d@2x.gif"
-        elif id_array[num] == 802:
-            idImage_array[num] = "03d@2x.gif"
-        elif id_array[num] == 803 or id_array[num] == 804:
-            idImage_array[num] = "04d@2x.gif"
-        else:
-            print("Invalid weather ID")
+        idImage_array[hour_index] = determine_weather_pictogram(weather_id)
 
     for image in idImage_array:
         wn.addshape(image)
@@ -341,67 +347,20 @@ while True:
 
     if (mode == 0):
         draw_clock(h, m, s, pen)
-        hourCursor, idImage_array = updateForecast()
+        hourCursor, idImage_array = update_forecast(data)
 
-        if(1-hourCursor < 0):
-            bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
-        else:
-            bg_hour1.shape(idImage_array[1-hourCursor])
-
-        if(2-hourCursor < 0):
-            bg_hour2.shape(idImage_array[12-abs(2-hourCursor)])
-        else:
-            bg_hour2.shape(idImage_array[2-hourCursor])
-
-        if(3-hourCursor < 0):
-            bg_hour3.shape(idImage_array[12-abs(3-hourCursor)])
-        else:
-            bg_hour3.shape(idImage_array[3-hourCursor])
-        
-        if(4-hourCursor < 0):
-            bg_hour4.shape(idImage_array[12-abs(4-hourCursor)])
-        else:
-            bg_hour4.shape(idImage_array[4-hourCursor])
-
-        if(5-hourCursor < 0):
-            bg_hour5.shape(idImage_array[12-abs(5-hourCursor)])
-        else:
-            bg_hour5.shape(idImage_array[5-hourCursor])
-
-        if(6-hourCursor < 0):
-            bg_hour6.shape(idImage_array[12-abs(6-hourCursor)])
-        else:
-            bg_hour6.shape(idImage_array[6-hourCursor])
-        
-        if(7-hourCursor < 0):
-            bg_hour7.shape(idImage_array[12-abs(7-hourCursor)])
-        else:
-            bg_hour7.shape(idImage_array[7-hourCursor])
-
-        if(8-hourCursor < 0):
-            bg_hour8.shape(idImage_array[12-abs(8-hourCursor)])
-        else:
-            bg_hour8.shape(idImage_array[8-hourCursor])
-
-        if(9-hourCursor < 0):
-            bg_hour9.shape(idImage_array[12-abs(9-hourCursor)])
-        else:
-            bg_hour9.shape(idImage_array[9-hourCursor])
-
-        if(10-hourCursor < 0):
-            bg_hour10.shape(idImage_array[12-abs(10-hourCursor)])
-        else:
-            bg_hour10.shape(idImage_array[10-hourCursor])
-
-        if(11-hourCursor < 0):
-            bg_hour11.shape(idImage_array[12-abs(11-hourCursor)])
-        else:
-            bg_hour11.shape(idImage_array[11-hourCursor])
-
-        if(12-hourCursor < 0):
-            bg_hour12.shape(idImage_array[12-abs(12-hourCursor)])
-        else:
-            bg_hour12.shape(idImage_array[12-hourCursor])
+        bg_hour1.shape(idImage_array[0])
+        bg_hour2.shape(idImage_array[1])
+        bg_hour3.shape(idImage_array[2])
+        bg_hour4.shape(idImage_array[3])
+        bg_hour5.shape(idImage_array[4])
+        bg_hour6.shape(idImage_array[5])
+        bg_hour7.shape(idImage_array[6])
+        bg_hour8.shape(idImage_array[7])
+        bg_hour9.shape(idImage_array[8])
+        bg_hour10.shape(idImage_array[9])
+        bg_hour11.shape(idImage_array[10])
+        bg_hour12.shape(idImage_array[11])
 
     wn.update()
 
