@@ -95,8 +95,7 @@ weatherUpdatePeriod = 10
 temp_array = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
-current_hour = 0
-hour_cursor = 0
+hour_cursor = int(time.strftime('%I'))
 
 res = requests.get(url)
 if res.ok:
@@ -205,15 +204,15 @@ def get_mouse_click_coordinate(x, y):
     logging.debug(f"hour {hour_touched} WAS TOUCHED !")
 
     tomorrow_date = None
-    if hour_touched < current_hour:
-        hours_ahead = 12-current_hour+hour_touched
+    if hour_touched < hour_cursor:
+        hours_ahead = 12-hour_cursor+hour_touched
         if current_meridiem == "PM":
             tomorrow_date = datetime.today() + timedelta(days=1)
             touched_meridiem = "AM"
         else:
             touched_meridiem = "PM"
     else:
-        hours_ahead = hour_touched - current_hour
+        hours_ahead = hour_touched - hour_cursor
         touched_meridiem = current_meridiem
 
     logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
@@ -324,24 +323,16 @@ def update_forecast():
 
     logging.debug("---- update_forecast() ----")
 
-    current_hour = int(time.strftime("%H"))
-    if current_hour > 12:
-        hour_cursor = current_hour - 12
-        meridiem = "PM"
-    elif current_hour == 0:
-        hour_cursor = 12
-        meridiem = "AM"
-    else:
-        hour_cursor = current_hour
-        meridiem = "AM"
+    hour_cursor = int(time.strftime("%I"))
+    meridiem = time.strftime('%p')
 
     logging.debug("hour_cursor: " + str(hour_cursor))
 
     for num in range(12):
         # current hour
-        logging.debug("current hour: " + time.strftime("%H") + " " + meridiem)
+        logging.debug("current hour: " + str(hour_cursor) + " " + meridiem)
         # forecast hour
-        logging.debug("forecast hour: " + str(int(time.strftime("%H"))+num))
+        logging.debug("forecast hour: " + str(int(hour_cursor)+num))
         logging.debug("temperature: " + str(data["hourly"][num]["temp"]))
         logging.debug("feels like: " + str(data["hourly"][num]["feels_like"]))
         logging.debug("wind speed: " + str(data["hourly"][num]["wind_speed"]))
@@ -601,4 +592,4 @@ while running:
 
 # if you don't do this, window will open and close immediately, should be the last line of your program
 # this line is technically unreachable code since the above while loop also closes the script.
-wn.mainloop()
+# wn.mainloop()
