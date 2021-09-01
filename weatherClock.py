@@ -13,7 +13,7 @@ longtitude = 37.538984
 
 tempColor = "gray"
 
-url = 'http://api.openweathermap.org/data/2.5/onecall?lat=55.646841&lon=37.538984&exclude=current,minutely,daily,alerts,flags&appid=ada7a5ef227c2f8b6d6252edb9a59a95&units=metric'
+url = 'http://api.openweathermap.org/data/2.5/onecall?lat=55.646841&lon=37.538984&exclude=current,minutely,daily,alerts,flags&appid=KEYHERE&units=metric'
 
 weatherUpdatePeriod = 10
 
