@@ -19,8 +19,10 @@ weatherUpdatePeriod = 10
 
 temp_array = [0] * 12
 temp_feel_array = [0] * 12
+wind_array = [0] * 12
 temp_array_was = [0] * 12
 temp_feel_array_was = [0] * 12
+wind_array_was = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
 idImage_array_was = [""] * 12
@@ -259,6 +261,7 @@ def updateForecast():
 
         temp_array[num] = data["hourly"][num]["temp"]
         temp_feel_array[num] = data["hourly"][num]["feels_like"]
+        wind_array[num] = data["hourly"][num]["wind_speed"]
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
         if id_array[num] >= 200 and id_array[num] <= 232:
@@ -298,6 +301,7 @@ def updateForecast():
             print("Invalid weather ID")
     print(temp_array)
     print(temp_feel_array)
+    print(wind_array)
     print(id_array)
     print(idImage_array)
 
@@ -323,6 +327,7 @@ pen.pensize(3)
 
 bg_hour = []
 bg_hourtext = []
+bg_windtext = []
 
 for i in range(0, 12):
     bg_hour_i = turtle.Turtle()
@@ -333,6 +338,11 @@ for i in range(0, 12):
     bg_hourtext_i.color(tempColor)
     bg_hourtext_i.hideturtle()
     bg_hourtext.append(bg_hourtext_i)
+
+    bg_windtext_i = turtle.Turtle()
+    bg_windtext_i.color(tempColor)
+    bg_windtext_i.hideturtle()
+    bg_windtext.append(bg_windtext_i)
 
 s = 0
 # time.sleep(10)
@@ -426,7 +436,8 @@ while True:
             if(idImage_array[j] != idImage_array_was[j]):
                 bg_hour[i-1].shape(idImage_array[j])
                 idImage_array_was[j] = idImage_array[j]
-            if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j])):
+            if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
+                        (wind_array[j] != wind_array_was[j])):
                 bg_hourtext[i-1].penup()
                 x_shift = 0
                 y_shift = 0
@@ -453,8 +464,17 @@ while True:
                 #else:
                 #    bg_hourtext[i-1].write(str(round(temp_array[j])) + "|" + str(round(temp_feel_array[j])),
                 #        align="right", font=("Verdana", tempText_FontSize, "bold"))
+                if (i in range(1,6)):
+                    bg_windtext[i-1].penup()
+                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift + 110, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                    bg_windtext[i-1].write(str(wind_array[j]) + " km/h", align="right", font=("Verdana", tempText_FontSize, ""))
+                if (i in range(7,12)):
+                    bg_windtext[i-1].penup()
+                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift - 50, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                    bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", tempText_FontSize, ""))
             temp_array_was[j] = temp_array[j]
             temp_feel_array_was[j] = temp_feel_array[j]
+            wind_array_was[j] = wind_array[j]
     #if (wasM != m):
     wn.update()
     wasM = m
