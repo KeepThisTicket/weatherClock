@@ -3,13 +3,16 @@ import turtle
 import math
 import requests
 from pprint import pprint
-from pynput.mouse import Listener
+#from pynput.mouse import Listener
 from datetime import datetime
 from datetime import timedelta
 
 # currently set to Vancouver, BC CANADA
 latitude = 55.646841
 longtitude = 37.538984
+
+gl_y_shift = 15
+gl_x_shift = -15
 
 tempColor = "gray"
 
@@ -151,53 +154,53 @@ def get_mouse_click_coor(x, y):
 
         weatherText.penup() # without this there is some weird ass line 
 
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing*3)
+        weatherText.goto(weatherText_Description + gl_x_shift, weatherText_vertSpacing*3 + gl_y_shift)
         weatherText.color("white")
         weatherText.write("Day", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # day of the week
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing*3)
+        weatherText.goto(weatherText_Data + gl_x_shift, weatherText_vertSpacing*3 + gl_y_shift)
         if (tomorrow == False):
             weatherText.write(datetime.today().strftime('%A'), align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
         else:
             weatherText.write(tomorrowDate.strftime('%A'), align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing*2)
+        weatherText.goto(weatherText_Description + gl_x_shift, weatherText_vertSpacing*2 + gl_y_shift)
         weatherText.write("hour", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # hour of the day
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing*2)
+        weatherText.goto(weatherText_Data + gl_x_shift, weatherText_vertSpacing*2 + gl_y_shift)
         weatherText.write(str(hourTouched) + " " + touchedMeridiem, align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing)
+        weatherText.goto(weatherText_Description + gl_x_shift, weatherText_vertSpacing + gl_y_shift)
         weatherText.write("temp", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # temperature
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing)
+        weatherText.goto(weatherText_Data + gl_x_shift, weatherText_vertSpacing + gl_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hoursAhead]["temp"], 1)) + degree_sign, align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
         
-        weatherText.goto(weatherText_Description, 0)
+        weatherText.goto(weatherText_Description + gl_x_shift, 0 + gl_y_shift)
         weatherText.write("Feels like", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # Feels like
 
-        weatherText.goto(weatherText_Data, 0)
+        weatherText.goto(weatherText_Data + gl_x_shift, 0 + gl_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hoursAhead]["feels_like"], 1)) + degree_sign, align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing)
+        weatherText.goto(weatherText_Description + gl_x_shift, -weatherText_vertSpacing + gl_y_shift)
         weatherText.write("POP", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # POP
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing)
+        weatherText.goto(weatherText_Data + gl_x_shift, -weatherText_vertSpacing + gl_y_shift)
         weatherText.write(str(int(data["hourly"][hoursAhead]["pop"]*100)) + " %", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing*2)
+        weatherText.goto(weatherText_Description + gl_x_shift, -weatherText_vertSpacing*2 + gl_y_shift)
         weatherText.write("Rain", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # Rain
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing*2)
+        weatherText.goto(weatherText_Data + gl_x_shift, -weatherText_vertSpacing*2 + gl_y_shift)
         if 'rain' not in data["hourly"][hoursAhead]:
             weatherText.write("--", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
         else:
             weatherText.write(str(data["hourly"][hoursAhead]["rain"]["1h"]) + " mm", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing*3)
+        weatherText.goto(weatherText_Description + gl_x_shift, -weatherText_vertSpacing*3 + gl_y_shift)
         weatherText.write("Wind", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold")) # Wind
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing*3)
+        weatherText.goto(weatherText_Data + gl_x_shift, -weatherText_vertSpacing*3 + gl_y_shift)
         weatherText.write(str(data["hourly"][hoursAhead]["wind_speed"]) + " km/h", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
 
         weatherText.hideturtle()
@@ -205,7 +208,7 @@ def get_mouse_click_coor(x, y):
         weatherDividerPen.pensize(3)
 
         weatherDividerPen.penup()
-        weatherDividerPen.goto(0, -80)
+        weatherDividerPen.goto(0 + gl_x_shift, -80 + gl_y_shift)
         weatherDividerPen.color("white")
         weatherDividerPen.setheading(90)
         weatherDividerPen.pendown()
@@ -314,7 +317,7 @@ wn.bgcolor("black")
 wn.screensize()
 #wn.setup(width=600, height=600)
 wn.setup(width = 1.0, height = 1.0) # Make fullscreen
-wn.title("WeatherClock 0.0.0")
+wn.title("Moscow / Derevlevo")
 wn.tracer(0) # turns off the animation, so you can't see anything when it is drawing
 
 # turtle.Screen().get‌​canvas()._root().over‌​rideredirect(True) # attempting to make borderless fullscreen
@@ -331,7 +334,7 @@ bg_windtext = []
 
 for i in range(0, 12):
     bg_hour_i = turtle.Turtle()
-    bg_hour_i.goto(hour_x[i], hour_y[i])
+    bg_hour_i.goto(hour_x[i] + gl_x_shift, hour_y[i] + gl_y_shift)
     bg_hour.append(bg_hour_i)
 
     bg_hourtext_i = turtle.Turtle()
@@ -373,7 +376,7 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
 
     # Draw the hour hand
     pen.penup()
-    pen.goto(0,0)
+    pen.goto(0 + gl_x_shift,0 + gl_y_shift)
     pen.color("white")
     pen.setheading(90)
     angle = (h / 12) * 360 + (m/60) * 30
@@ -383,7 +386,7 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
 
     # Draw the minute hand
     pen.penup()
-    pen.goto(0,0)
+    pen.goto(0 + gl_x_shift,0 + gl_y_shift)
     pen.color("yellow")
     pen.setheading(90)
     angle = (m / 60) * 360  # optional + (s/60) * 6
@@ -393,7 +396,7 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
 
     # Draw the second hand
     pen.penup()
-    pen.goto(0,0)
+    pen.goto(0 + gl_x_shift,0 + gl_y_shift)
     pen.color("gray")
     pen.setheading(90)
     angle = (s / 60) * 360
@@ -454,7 +457,7 @@ while True:
                 if (idImage_array[j] == "03d@2x.gif"):
                     x_shift = 0
                     y_shift = -5
-                bg_hourtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing + x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                bg_hourtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing + x_shift + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                 v = int(round(temp_array[j]))
                 v2 = int(round(temp_feel_array[j]))
                 bg_hourtext[i-1].write(str(round(temp_array[j])), align="right", font=("Verdana", tempText_FontSize, "bold"))
@@ -466,11 +469,11 @@ while True:
                 #        align="right", font=("Verdana", tempText_FontSize, "bold"))
                 if (i in range(1,6)):
                     bg_windtext[i-1].penup()
-                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift + 110, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift + 110 + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                     bg_windtext[i-1].write(str(wind_array[j]) + " km/h", align="right", font=("Verdana", tempText_FontSize, ""))
                 if (i in range(7,12)):
                     bg_windtext[i-1].penup()
-                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift - 50, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                    bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift - 50 + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                     bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", tempText_FontSize, ""))
             temp_array_was[j] = temp_array[j]
             temp_feel_array_was[j] = temp_feel_array[j]
