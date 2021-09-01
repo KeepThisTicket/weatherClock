@@ -8,16 +8,22 @@ from datetime import datetime
 from datetime import timedelta
 
 # currently set to Vancouver, BC CANADA
-latitude = 49.2827
-longtitude = -123.1207
+latitude = 55.646841
+longtitude = 37.538984
 
-url = 'http://api.openweathermap.org/data/2.5/onecall?lat=49.2827&lon=-123.1207&exclude=current,minutely,daily,alerts,flags&appid=APIKEYHERE&units=metric'
+tempColor = "gray"
+
+url = 'http://api.openweathermap.org/data/2.5/onecall?lat=55.646841&lon=37.538984&exclude=current,minutely,daily,alerts,flags&appid=ada7a5ef227c2f8b6d6252edb9a59a95&units=metric'
 
 weatherUpdatePeriod = 10
 
 temp_array = [0] * 12
+temp_feel_array = [0] * 12
+temp_array_was = [0] * 12
+temp_feel_array_was = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
+idImage_array_was = [""] * 12
 currentHour = 0
 hourCursor = 0
 
@@ -31,9 +37,12 @@ cursor_y = 0
 
 weatherText = turtle.Turtle()
 weatherText.hideturtle()
-weatherText_Description = -30
-weatherText_Data = 30
-weatherText_vertSpacing = 25
+weatherText_Description = -10
+weatherText_Data = 10
+weatherText_vertSpacing = 17
+tempText_vertSpacing = -9
+tempText_horzSpacing = 11
+tempText_FontSize = 11
 weatherText_DescriptionFontSize = 11
 weatherText_DataFontSize = 10
 
@@ -48,19 +57,33 @@ mode = 0 # 1 - hourly detail mode, 0 - analog clock face mode
 hourlyTouchSize = 25 # determines radius for user touch when going into hourly detail mode
 
 deg_to_radians = 0.0174533
-radius = 210 # determines how big clock is
-hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
-hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
-hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
-hour4_x, hour4_y = math.cos(-30*deg_to_radians)*radius, math.sin(-30*deg_to_radians)*radius
-hour5_x, hour5_y = math.cos(-60*deg_to_radians)*radius, math.sin(-60*deg_to_radians)*radius
-hour6_x, hour6_y = math.cos(-90*deg_to_radians)*radius, math.sin(-90*deg_to_radians)*radius
-hour7_x, hour7_y = math.cos(-120*deg_to_radians)*radius, math.sin(-120*deg_to_radians)*radius
-hour8_x, hour8_y = math.cos(-150*deg_to_radians)*radius, math.sin(-150*deg_to_radians)*radius
-hour9_x, hour9_y = math.cos(-180*deg_to_radians)*radius, math.sin(-180*deg_to_radians)*radius
-hour10_x, hour10_y = math.cos(-210*deg_to_radians)*radius, math.sin(-210*deg_to_radians)*radius
-hour11_x, hour11_y = math.cos(-240*deg_to_radians)*radius, math.sin(-240*deg_to_radians)*radius
-hour12_x, hour12_y = math.cos(-270*deg_to_radians)*radius, math.sin(-270*deg_to_radians)*radius
+radius = 120 # determines how big clock is
+hour_x = [0] * 12
+hour_y = [0] * 12
+hour_x[0] = math.cos(60*deg_to_radians)*radius
+hour_y[0] = math.sin(60*deg_to_radians)*radius
+hour_x[1] = math.cos(30*deg_to_radians)*radius
+hour_y[1] = math.sin(30*deg_to_radians)*radius
+hour_x[2] = math.cos(0*deg_to_radians)*radius
+hour_y[3] = math.sin(0*deg_to_radians)*radius
+hour_x[3] = math.cos(-30*deg_to_radians)*radius
+hour_y[3] = math.sin(-30*deg_to_radians)*radius
+hour_x[4] = math.cos(-60*deg_to_radians)*radius
+hour_y[4] = math.sin(-60*deg_to_radians)*radius
+hour_x[5] = math.cos(-90*deg_to_radians)*radius
+hour_y[5] = math.sin(-90*deg_to_radians)*radius
+hour_x[6] = math.cos(-120*deg_to_radians)*radius
+hour_y[6] = math.sin(-120*deg_to_radians)*radius
+hour_x[7] = math.cos(-150*deg_to_radians)*radius
+hour_y[7] = math.sin(-150*deg_to_radians)*radius
+hour_x[8] = math.cos(-180*deg_to_radians)*radius
+hour_y[8] = math.sin(-180*deg_to_radians)*radius
+hour_x[9] = math.cos(-210*deg_to_radians)*radius
+hour_y[9] = math.sin(-210*deg_to_radians)*radius
+hour_x[10] = math.cos(-240*deg_to_radians)*radius
+hour_y[10] = math.sin(-240*deg_to_radians)*radius
+hour_x[11] = math.cos(-270*deg_to_radians)*radius
+hour_y[11] = math.sin(-270*deg_to_radians)*radius
 
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
@@ -98,42 +121,10 @@ def get_mouse_click_coor(x, y):
 
     hourTouched = -1
 
-    if (touchInBox(cursor_x, cursor_y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 1 WAS TOUCHED !")
-        hourTouched = 1
-    elif (touchInBox(cursor_x, cursor_y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 2 WAS TOUCHED !")
-        hourTouched = 2
-    elif (touchInBox(cursor_x, cursor_y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 3 WAS TOUCHED !")
-        hourTouched = 3
-    elif (touchInBox(cursor_x, cursor_y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 4 WAS TOUCHED !")
-        hourTouched = 4
-    elif (touchInBox(cursor_x, cursor_y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 5 WAS TOUCHED !")
-        hourTouched = 5
-    elif (touchInBox(cursor_x, cursor_y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 6 WAS TOUCHED !")
-        hourTouched = 6
-    elif (touchInBox(cursor_x, cursor_y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 7 WAS TOUCHED !")
-        hourTouched = 7
-    elif (touchInBox(cursor_x, cursor_y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 8 WAS TOUCHED !")
-        hourTouched = 8
-    elif (touchInBox(cursor_x, cursor_y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 9 WAS TOUCHED !")
-        hourTouched = 9
-    elif (touchInBox(cursor_x, cursor_y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 10 WAS TOUCHED !")
-        hourTouched = 10
-    elif (touchInBox(cursor_x, cursor_y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 11 WAS TOUCHED !")
-        hourTouched = 11
-    elif (touchInBox(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize)):
-        print("hour 12 WAS TOUCHED !")
-        hourTouched = 12
+    for i in range(0, 12):
+        if (touchInBox(cursor_x, cursor_y, hour_x[i], hour_y[i], hourlyTouchSize, hourlyTouchSize)):
+            hourTouched = i + 1
+            print("hour {hourTouched} WAS TOUCHED !")
 
     tomorrow = False
     if (hourTouched < currentHour):
@@ -266,9 +257,8 @@ def updateForecast():
         else:
             print("rain: " + str(data["hourly"][num]["rain"]))
 
-        
-
         temp_array[num] = data["hourly"][num]["temp"]
+        temp_feel_array[num] = data["hourly"][num]["feels_like"]
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
         if id_array[num] >= 200 and id_array[num] <= 232:
@@ -306,8 +296,8 @@ def updateForecast():
             idImage_array[num] = "04d@2x.gif"
         else:
             print("Invalid weather ID")
-
     print(temp_array)
+    print(temp_feel_array)
     print(id_array)
     print(idImage_array)
 
@@ -331,41 +321,18 @@ pen.hideturtle()
 pen.speed(0) # 0 is fastest it can go
 pen.pensize(3)
 
-bg_hour1 = turtle.Turtle()
-bg_hour1.goto(hour1_x, hour1_y)
+bg_hour = []
+bg_hourtext = []
 
-bg_hour2 = turtle.Turtle()
-bg_hour2.goto(hour2_x, hour2_y)
+for i in range(0, 12):
+    bg_hour_i = turtle.Turtle()
+    bg_hour_i.goto(hour_x[i], hour_y[i])
+    bg_hour.append(bg_hour_i)
 
-bg_hour3 = turtle.Turtle()
-bg_hour3.goto(hour3_x, hour3_y)
-
-bg_hour4 = turtle.Turtle()
-bg_hour4.goto(hour4_x, hour4_y)
-
-bg_hour5 = turtle.Turtle()
-bg_hour5.goto(hour5_x, hour5_y)
-
-bg_hour6 = turtle.Turtle()
-bg_hour6.goto(hour6_x, hour6_y)
-
-bg_hour7 = turtle.Turtle()
-bg_hour7.goto(hour7_x, hour7_y)
-
-bg_hour8 = turtle.Turtle()
-bg_hour8.goto(hour8_x, hour8_y)
-
-bg_hour9 = turtle.Turtle()
-bg_hour9.goto(hour9_x, hour9_y)
-
-bg_hour10 = turtle.Turtle()
-bg_hour10.goto(hour10_x, hour10_y)
-
-bg_hour11 = turtle.Turtle()
-bg_hour11.goto(hour11_x, hour11_y)
-
-bg_hour12 = turtle.Turtle()
-bg_hour12.goto(hour12_x, hour12_y)
+    bg_hourtext_i = turtle.Turtle()
+    bg_hourtext_i.color(tempColor)
+    bg_hourtext_i.hideturtle()
+    bg_hourtext.append(bg_hourtext_i)
 
 s = 0
 # time.sleep(10)
@@ -402,30 +369,32 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     angle = (h / 12) * 360 + (m/60) * 30
     pen.rt(angle)
     pen.pendown()
-    pen.fd(100)
+    pen.fd(45)
 
     # Draw the minute hand
     pen.penup()
     pen.goto(0,0)
-    pen.color("white")
+    pen.color("yellow")
     pen.setheading(90)
     angle = (m / 60) * 360  # optional + (s/60) * 6
     pen.rt(angle)
     pen.pendown()
-    pen.fd(170)
+    pen.fd(70)
 
     # Draw the second hand
     pen.penup()
     pen.goto(0,0)
-    pen.color("red")
+    pen.color("gray")
     pen.setheading(90)
     angle = (s / 60) * 360
     pen.rt(angle)
     pen.pendown()
-    pen.fd(75)    
+    pen.fd(85)
+
+wasM = 0
 
 while True:
-    
+
     print("")
     print("... Main Loop Start ... ")
     print("")
@@ -435,7 +404,7 @@ while True:
     s = int(time.strftime("%S"))
 
     print(str(h) + " " + str(m) + " " + str(s))
-    
+
     if (m % weatherUpdatePeriod == 0 and s == 0): # every x minutes, fetch new weather data
         res = requests.get(url)
         data = res.json()
@@ -449,68 +418,46 @@ while True:
 
         print("hourCursor: " + str(hourCursor))
 
-        if(1-hourCursor < 0):
-            bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
-        else:
-            bg_hour1.shape(idImage_array[1-hourCursor])
-
-        if(2-hourCursor < 0):
-            bg_hour2.shape(idImage_array[12-abs(2-hourCursor)])
-        else:
-            bg_hour2.shape(idImage_array[2-hourCursor])
-
-        if(3-hourCursor < 0):
-            bg_hour3.shape(idImage_array[12-abs(3-hourCursor)])
-        else:
-            bg_hour3.shape(idImage_array[3-hourCursor])
-        
-        if(4-hourCursor < 0):
-            bg_hour4.shape(idImage_array[12-abs(4-hourCursor)])
-        else:
-            bg_hour4.shape(idImage_array[4-hourCursor])
-
-        if(5-hourCursor < 0):
-            bg_hour5.shape(idImage_array[12-abs(5-hourCursor)])
-        else:
-            bg_hour5.shape(idImage_array[5-hourCursor])
-
-        if(6-hourCursor < 0):
-            bg_hour6.shape(idImage_array[12-abs(6-hourCursor)])
-        else:
-            bg_hour6.shape(idImage_array[6-hourCursor])
-        
-        if(7-hourCursor < 0):
-            bg_hour7.shape(idImage_array[12-abs(7-hourCursor)])
-        else:
-            bg_hour7.shape(idImage_array[7-hourCursor])
-
-        if(8-hourCursor < 0):
-            bg_hour8.shape(idImage_array[12-abs(8-hourCursor)])
-        else:
-            bg_hour8.shape(idImage_array[8-hourCursor])
-
-        if(9-hourCursor < 0):
-            bg_hour9.shape(idImage_array[12-abs(9-hourCursor)])
-        else:
-            bg_hour9.shape(idImage_array[9-hourCursor])
-
-        if(10-hourCursor < 0):
-            bg_hour10.shape(idImage_array[12-abs(10-hourCursor)])
-        else:
-            bg_hour10.shape(idImage_array[10-hourCursor])
-
-        if(11-hourCursor < 0):
-            bg_hour11.shape(idImage_array[12-abs(11-hourCursor)])
-        else:
-            bg_hour11.shape(idImage_array[11-hourCursor])
-
-        if(12-hourCursor < 0):
-            bg_hour12.shape(idImage_array[12-abs(12-hourCursor)])
-        else:
-            bg_hour12.shape(idImage_array[12-hourCursor])
-
+        for i in range(1, 13):
+            if(i-hourCursor < 0):
+                j = 12-abs(i-hourCursor)
+            else:
+                j = i-hourCursor
+            if(idImage_array[j] != idImage_array_was[j]):
+                bg_hour[i-1].shape(idImage_array[j])
+                idImage_array_was[j] = idImage_array[j]
+            if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j])):
+                bg_hourtext[i-1].penup()
+                x_shift = 0
+                y_shift = 0
+                #print(idImage_array[i-1])
+                if ((idImage_array[j] == "04d@2x.gif") or (idImage_array[j] == "02d@2x.gif")):
+                    x_shift = -4
+                    y_shift = -8
+                if (idImage_array[j] == "11d@2x.gif"):
+                    x_shift = -6
+                    y_shift = 3
+                if ((idImage_array[j] == "09d@2x.gif") or  (idImage_array[j] == "10d@2x.gif")):
+                    x_shift = -4
+                    y_shift = 3
+                if (idImage_array[j] == "03d@2x.gif"):
+                    x_shift = 0
+                    y_shift = -5
+                bg_hourtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing + x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift)
+                v = int(round(temp_array[j]))
+                v2 = int(round(temp_feel_array[j]))
+                bg_hourtext[i-1].write(str(round(temp_array[j])), align="right", font=("Verdana", tempText_FontSize, "bold"))
+                # looks bad
+                #if (v == v2):
+                #    bg_hourtext[i-1].write(str(round(temp_array[j])), align="right", font=("Verdana", tempText_FontSize, "bold"))
+                #else:
+                #    bg_hourtext[i-1].write(str(round(temp_array[j])) + "|" + str(round(temp_feel_array[j])),
+                #        align="right", font=("Verdana", tempText_FontSize, "bold"))
+            temp_array_was[j] = temp_array[j]
+            temp_feel_array_was[j] = temp_feel_array[j]
+    #if (wasM != m):
     wn.update()
-
+    wasM = m
     # cursor / touch logic
     turtle.onscreenclick(get_mouse_click_coor) # this returns the coordinate of the press !
     print("MODE:" + str(mode))
@@ -519,7 +466,7 @@ while True:
     if(cursor_x != -1 and cursor_y != -1):
         print("screen was touched")
 
-    
+
 
     time.sleep(1)
 
