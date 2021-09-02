@@ -461,6 +461,8 @@ while True:
                 if (idImage_array[j] == "03d@2x.gif"):
                     x_shift = 0
                     y_shift = -5
+                if (temp_array[j]<10):
+                    x_shift = x_shift - 5    
                 bg_hourtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing + x_shift + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                 v = int(round(temp_array[j]))
                 v2 = int(round(temp_feel_array[j]))
