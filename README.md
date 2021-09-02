@@ -16,5 +16,17 @@ You will need to:
 NOTE: I have experienced an issue with running this on the Pi Zero W - after a few days, the program starts to get super slow and at some point the program closes itself. A few contributors have provided some potential solutions and these are under test.
 
 For any questions/comments - you can open an issue or contact me directly at k3vinwu25@gmail.com !
+---
+If you want you can create autostart script (for xfce4 you should put it into ~/.config/autostart) with the contents like this:
 
-
+cd  /home/plotn/github/weatherClock/
+while :
+do
+  if test "$(ps aux | grep python3 | grep weather | wc -l)" -eq "0"
+  then
+    python3 ./weatherClock.py & disown
+  else
+    echo "already started"
+  fi
+  sleep 5
+done
