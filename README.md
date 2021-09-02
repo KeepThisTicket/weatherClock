@@ -19,6 +19,7 @@ For any questions/comments - you can open an issue or contact me directly at k3v
 ---
 If you want you can create autostart script (for xfce4 you should put it into ~/.config/autostart) with the contents like this:
 
+```
 cd  /home/plotn/github/weatherClock/
 while :
 do
@@ -30,3 +31,4 @@ do
   fi
   sleep 5
 done
+```
