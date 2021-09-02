@@ -442,7 +442,7 @@ while True:
             if(idImage_array[j] != idImage_array_was[j]):
                 bg_hour[i-1].shape(idImage_array[j])
                 idImage_array_was[j] = idImage_array[j]
-            if ((needUpdate) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
+            if ((needUpdate) or (idImage_array[j] != idImage_array_was[j]) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
                         (wind_array[j] != wind_array_was[j])):
                 bg_hourtext[i-1].clear()
                 bg_hourtext[i-1].penup()
