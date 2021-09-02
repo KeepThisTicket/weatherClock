@@ -7,7 +7,7 @@ from pprint import pprint
 from datetime import datetime
 from datetime import timedelta
 
-# currently set to Vancouver, BC CANADA
+# currently set to Moscow / Derevlevo
 latitude = 55.646841
 longtitude = 37.538984
 
@@ -418,12 +418,15 @@ while True:
 
     print(str(h) + " " + str(m) + " " + str(s))
 
+    needUpdate = False
+
     if (m % weatherUpdatePeriod == 0 and s == 0): # every x minutes, fetch new weather data
         res = requests.get(url)
         data = res.json()
         print("")
         print("** FETCHED NEW DATA **")
         print("")
+        needUpdate = True
 
     if (mode == 0):
         draw_clock(h, m, s, pen)
@@ -439,7 +442,7 @@ while True:
             if(idImage_array[j] != idImage_array_was[j]):
                 bg_hour[i-1].shape(idImage_array[j])
                 idImage_array_was[j] = idImage_array[j]
-            if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
+            if ((needUpdate) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
                         (wind_array[j] != wind_array_was[j])):
                 bg_hourtext[i-1].clear()
                 bg_hourtext[i-1].penup()
