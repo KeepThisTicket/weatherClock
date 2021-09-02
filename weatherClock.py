@@ -441,6 +441,7 @@ while True:
                 idImage_array_was[j] = idImage_array[j]
             if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
                         (wind_array[j] != wind_array_was[j])):
+                bg_hourtext[i-1].clear()
                 bg_hourtext[i-1].penup()
                 x_shift = 0
                 y_shift = 0
@@ -468,10 +469,12 @@ while True:
                 #    bg_hourtext[i-1].write(str(round(temp_array[j])) + "|" + str(round(temp_feel_array[j])),
                 #        align="right", font=("Verdana", tempText_FontSize, "bold"))
                 if (i in range(1,6)):
+                    bg_windtext[i-1].clear()
                     bg_windtext[i-1].penup()
                     bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift + 110 + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                     bg_windtext[i-1].write(str(wind_array[j]) + " km/h", align="right", font=("Verdana", tempText_FontSize, ""))
                 if (i in range(7,12)):
+                    bg_windtext[i-1].clear()
                     bg_windtext[i-1].penup()
                     bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift - 50 + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                     bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", tempText_FontSize, ""))
