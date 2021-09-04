@@ -40,7 +40,7 @@ print(data)
 cursor_x = 0
 cursor_y = 0
 
-weatherText = turtle.Turtle()
+weatherText = turtle.Turtle()  
 weatherText.hideturtle()
 weatherText_Description = -10
 weatherText_Data = 10
@@ -441,7 +441,6 @@ while True:
                 j = i-hourCursor
             if(idImage_array[j] != idImage_array_was[j]):
                 bg_hour[i-1].shape(idImage_array[j])
-                idImage_array_was[j] = idImage_array[j]
             if ((needUpdate) or (idImage_array[j] != idImage_array_was[j]) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
                         (wind_array[j] != wind_array_was[j])):
                 bg_hourtext[i-1].clear()
@@ -483,6 +482,7 @@ while True:
                     bg_windtext[i-1].penup()
                     bg_windtext[i-1].goto(hour_x[i-1] + tempText_horzSpacing +  x_shift - 50 + gl_x_shift, hour_y[i-1] + tempText_vertSpacing + y_shift + gl_y_shift)
                     bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", tempText_FontSize, ""))
+            idImage_array_was[j] = idImage_array[j]
             temp_array_was[j] = temp_array[j]
             temp_feel_array_was[j] = temp_feel_array[j]
             wind_array_was[j] = wind_array[j]
