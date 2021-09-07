@@ -487,6 +487,7 @@ def on_close():
 
 
 top_window.protocol("WM_DELETE_WINDOW", on_close)
+top_window.overrideredirect(True)
 wn.listen()
 
 while running:
