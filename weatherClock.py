@@ -204,7 +204,7 @@ def get_mouse_click_coordinate(x, y):
     logging.debug(f"hour {hour_touched} WAS TOUCHED !")
 
     tomorrow_date = None
-    if hour_touched < hour_cursor:
+    if hour_touched < hour_cursor and not hour_cursor == 12:
         hours_ahead = 12-hour_cursor+hour_touched
         if current_meridiem == "PM":
             tomorrow_date = datetime.today() + timedelta(days=1)
@@ -212,10 +212,13 @@ def get_mouse_click_coordinate(x, y):
         else:
             touched_meridiem = "PM"
     else:
-        hours_ahead = hour_touched - hour_cursor
+        if hour_cursor == 12:
+            hours_ahead = hour_touched
+        else:
+            hours_ahead = hour_touched - hour_cursor
         touched_meridiem = current_meridiem
-
-    logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
+    if hours_ahead > 0:
+        logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
     if mode == 0 and hour_touched != -1:
         # go to hourly detail mode
