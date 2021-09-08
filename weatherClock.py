@@ -201,24 +201,25 @@ def get_mouse_click_coordinate(x, y):
         hour_touched = 11
     elif touch_in_box(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize):
         hour_touched = 12
-    logging.debug(f"hour {hour_touched} WAS TOUCHED !")
-
     tomorrow_date = None
-    if hour_touched < hour_cursor and not hour_cursor == 12:
-        hours_ahead = 12-hour_cursor+hour_touched
-        if current_meridiem == "PM":
-            tomorrow_date = datetime.today() + timedelta(days=1)
-            touched_meridiem = "AM"
+    if hour_touched >= 0:
+        logging.debug(f"hour {hour_touched} WAS TOUCHED !")
+
+        if hour_touched < hour_cursor and not hour_cursor == 12:
+            hours_ahead = 12-hour_cursor+hour_touched
+            if current_meridiem == "PM":
+                tomorrow_date = datetime.today() + timedelta(days=1)
+                touched_meridiem = "AM"
+            else:
+                touched_meridiem = "PM"
         else:
-            touched_meridiem = "PM"
-    else:
-        if hour_cursor == 12:
-            hours_ahead = hour_touched
-        else:
-            hours_ahead = hour_touched - hour_cursor
-        touched_meridiem = current_meridiem
-    if hours_ahead > 0:
-        logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
+            if hour_cursor == 12:
+                hours_ahead = hour_touched
+            else:
+                hours_ahead = hour_touched - hour_cursor
+            touched_meridiem = current_meridiem
+        if hours_ahead >= 0:
+            logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
     if mode == 0 and hour_touched != -1:
         # go to hourly detail mode
