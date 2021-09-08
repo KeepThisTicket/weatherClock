@@ -347,7 +347,7 @@ def update_forecast():
         if 'rain' not in data["hourly"][num]:
             logging.debug("no rain data")
         else:
-            logging.info("rain: " + str(data["hourly"][num]["rain"]))
+            logging.debug("rain: " + str(data["hourly"][num]["rain"]))
 
         temp_array[num] = data["hourly"][num]["temp"]
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
