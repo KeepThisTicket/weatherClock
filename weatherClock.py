@@ -1,11 +1,17 @@
+#!/user/bin/env python
+# -*- coding: utf-8 -*-
+
 import time
 import turtle
 import math
 import requests
 from pprint import pprint
 from pynput.mouse import Listener
+from pynput.keyboard import Key, Controller
 from datetime import datetime
 from datetime import timedelta
+
+keyboard = Controller()
 
 # currently set to Vancouver, BC CANADA
 latitude = 49.2827
@@ -33,9 +39,9 @@ weatherText = turtle.Turtle()
 weatherText.hideturtle()
 weatherText_Description = -30
 weatherText_Data = 30
-weatherText_vertSpacing = 25
-weatherText_DescriptionFontSize = 11
-weatherText_DataFontSize = 10
+weatherText_vertSpacing = 40
+weatherText_DescriptionFontSize = 20
+weatherText_DataFontSize = 19
 
 weatherDividerPen = turtle.Turtle()
 weatherDividerPen.hideturtle()
@@ -45,10 +51,10 @@ degree_sign = u"\N{DEGREE SIGN}"
 
 mode = 0 # 1 - hourly detail mode, 0 - analog clock face mode
 
-hourlyTouchSize = 25 # determines radius for user touch when going into hourly detail mode
+hourlyTouchSize = 50 # determines radius for user touch when going into hourly detail mode
 
 deg_to_radians = 0.0174533
-radius = 210 # determines how big clock is
+radius = 265 # determines how big clock is
 hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
 hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
 hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
@@ -88,6 +94,9 @@ def get_mouse_click_coor(x, y):
     currentHour = int(time.strftime("%H"))
     if currentHour > 12:
         hourCursor = currentHour - 12
+        currentMeridiem = "PM"
+    elif currentHour == 12:
+        hourCursor = 12
         currentMeridiem = "PM"
     elif currentHour == 0:
         hourCursor = 12
@@ -212,11 +221,11 @@ def get_mouse_click_coor(x, y):
         weatherDividerPen.pensize(3)
 
         weatherDividerPen.penup()
-        weatherDividerPen.goto(0, -80)
+        weatherDividerPen.goto(0, -125)
         weatherDividerPen.color("white")
         weatherDividerPen.setheading(90)
         weatherDividerPen.pendown()
-        weatherDividerPen.fd(160)
+        weatherDividerPen.fd(275)
         weatherDividerPen.hideturtle()
 
     elif (mode == 1 and touchInBox(cursor_x, cursor_y, 0, 0, 200, 200)):
@@ -323,8 +332,6 @@ wn.setup(width = 1.0, height = 1.0) # Make fullscreen
 wn.title("WeatherClock 0.0.0")
 wn.tracer(0) # turns off the animation, so you can't see anything when it is drawing
 
-# turtle.Screen().get‌​canvas()._root().over‌​rideredirect(True) # attempting to make borderless fullscreen
-
 # create our drawing pen
 pen = turtle.Turtle()
 pen.hideturtle()
@@ -367,9 +374,6 @@ bg_hour11.goto(hour11_x, hour11_y)
 bg_hour12 = turtle.Turtle()
 bg_hour12.goto(hour12_x, hour12_y)
 
-s = 0
-# time.sleep(10)
-
 def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     # Draw the clock face
     #pen.up()
@@ -398,8 +402,9 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     pen.penup()
     pen.goto(0,0)
     pen.color("white")
+    pen.pensize(6)
     pen.setheading(90)
-    angle = (h / 12) * 360 + (m/60) * 30
+    angle = (h / 12.0) * 360 + (m/60.0) * 30
     pen.rt(angle)
     pen.pendown()
     pen.fd(100)
@@ -409,7 +414,7 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     pen.goto(0,0)
     pen.color("white")
     pen.setheading(90)
-    angle = (m / 60) * 360  # optional + (s/60) * 6
+    angle = (m / 60.0) * 360  # optional + (s/60) * 6
     pen.rt(angle)
     pen.pendown()
     pen.fd(170)
@@ -419,10 +424,81 @@ def draw_clock(h, m, s, pen): # draw a clock using the pen i created
     pen.goto(0,0)
     pen.color("red")
     pen.setheading(90)
-    angle = (s / 60) * 360
+    angle = (s / 60.0) * 360
     pen.rt(angle)
     pen.pendown()
-    pen.fd(75)    
+    pen.fd(75)
+
+# makes the program fullscreen
+time.sleep(1)
+keyboard.press(Key.alt)
+keyboard.press(Key.f11)
+time.sleep(0.05)
+keyboard.release(Key.f11)
+keyboard.release(Key.alt)
+time.sleep(1)    
+
+updateForecast()
+
+if(1-hourCursor < 0):
+    bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
+else:
+    bg_hour1.shape(idImage_array[1-hourCursor])
+
+if(2-hourCursor < 0):
+    bg_hour2.shape(idImage_array[12-abs(2-hourCursor)])
+else:
+    bg_hour2.shape(idImage_array[2-hourCursor])
+
+if(3-hourCursor < 0):
+    bg_hour3.shape(idImage_array[12-abs(3-hourCursor)])
+else:
+    bg_hour3.shape(idImage_array[3-hourCursor])
+
+if(4-hourCursor < 0):
+    bg_hour4.shape(idImage_array[12-abs(4-hourCursor)])
+else:
+    bg_hour4.shape(idImage_array[4-hourCursor])
+
+if(5-hourCursor < 0):
+    bg_hour5.shape(idImage_array[12-abs(5-hourCursor)])
+else:
+    bg_hour5.shape(idImage_array[5-hourCursor])
+
+if(6-hourCursor < 0):
+    bg_hour6.shape(idImage_array[12-abs(6-hourCursor)])
+else:
+    bg_hour6.shape(idImage_array[6-hourCursor])
+
+if(7-hourCursor < 0):
+    bg_hour7.shape(idImage_array[12-abs(7-hourCursor)])
+else:
+    bg_hour7.shape(idImage_array[7-hourCursor])
+
+if(8-hourCursor < 0):
+    bg_hour8.shape(idImage_array[12-abs(8-hourCursor)])
+else:
+    bg_hour8.shape(idImage_array[8-hourCursor])
+
+if(9-hourCursor < 0):
+    bg_hour9.shape(idImage_array[12-abs(9-hourCursor)])
+else:
+    bg_hour9.shape(idImage_array[9-hourCursor])
+
+if(10-hourCursor < 0):
+    bg_hour10.shape(idImage_array[12-abs(10-hourCursor)])
+else:
+    bg_hour10.shape(idImage_array[10-hourCursor])
+
+if(11-hourCursor < 0):
+    bg_hour11.shape(idImage_array[12-abs(11-hourCursor)])
+else:
+    bg_hour11.shape(idImage_array[11-hourCursor])
+
+if(12-hourCursor < 0):
+    bg_hour12.shape(idImage_array[12-abs(12-hourCursor)])
+else:
+    bg_hour12.shape(idImage_array[12-hourCursor])
 
 while True:
     
@@ -443,11 +519,7 @@ while True:
         print("** FETCHED NEW DATA **")
         print("")
 
-    if (mode == 0):
-        draw_clock(h, m, s, pen)
         updateForecast()
-
-        print("hourCursor: " + str(hourCursor))
 
         if(1-hourCursor < 0):
             bg_hour1.shape(idImage_array[12-abs(1-hourCursor)])
@@ -509,6 +581,9 @@ while True:
         else:
             bg_hour12.shape(idImage_array[12-hourCursor])
 
+    if (mode == 0):
+        draw_clock(h, m, s, pen)
+
     wn.update()
 
     # cursor / touch logic
@@ -518,8 +593,6 @@ while True:
 
     if(cursor_x != -1 and cursor_y != -1):
         print("screen was touched")
-
-    
 
     time.sleep(1)
 
