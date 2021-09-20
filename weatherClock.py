@@ -9,7 +9,9 @@ import sys
 import os
 import getopt
 from datetime import datetime, timedelta
+from pynput.keyboard import Key, Controller
 
+keyboard = Controller()
 
 path = os.path.dirname(os.path.realpath(__file__))
 
@@ -125,11 +127,11 @@ degree_sign = u"\N{DEGREE SIGN}"
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
 # determines radius for user touch when going into hourly detail mode
-hourlyTouchSize = 25
+hourlyTouchSize = 50
 
 deg_to_radians = 0.0174533
 # determines how big clock is
-radius = 210
+radius = 265
 hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
 hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
 hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
@@ -477,6 +479,13 @@ def draw_clock(hour, minute, second, pen):
     pen.pendown()
     pen.fd(75)
 
+# makes the program fullscreen when you launch it
+keyboard.press(Key.alt)
+keyboard.press(Key.f11)
+time.sleep(0.05)
+keyboard.release(Key.f11)
+keyboard.release(Key.alt)
+time.sleep(1)   
 
 canvas = wn.getcanvas()
 top_window = canvas.winfo_toplevel()
