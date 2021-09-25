@@ -25,6 +25,7 @@ try:
     if options:
         print(f"Options: {options}")
     api_key = False
+    theme = "default"
     log_level = False
     latitude = False
     longitude = False
@@ -83,6 +84,7 @@ try:
         if not api_key:
             api_key_setting = settings.get('ApiKey')
             api_key = api_key_setting if api_key_setting else False
+        theme = settings.get('Theme')    
         if not log_level:
             log_level = settings.get('LogLevel')
         if not latitude:
@@ -399,28 +401,30 @@ def update_forecast():
         wind_array[num] = data["hourly"][num]["wind_speed"]      
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
+        path_theme = os.path.join(path, theme)
+
         if 232 >= id_array[num] >= 200:
-            idImage_array[num] = os.path.join(path, "11d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "11d@2x.gif")
         elif 321 >= id_array[num] >= 300:
-            idImage_array[num] = os.path.join(path, "09d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
         elif 504 >= id_array[num] >= 500:
-            idImage_array[num] = os.path.join(path, "10d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "10d@2x.gif")
         elif id_array[num] == 511:
-            idImage_array[num] = os.path.join(path, "13d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
         elif 531 >= id_array[num] >= 520:
-            idImage_array[num] = os.path.join(path, "09d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
         elif 622 >= id_array[num] >= 600:
-            idImage_array[num] = os.path.join(path, "13d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
         elif 781 >= id_array[num] >= 701:
-            idImage_array[num] = os.path.join(path, "50d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "50d@2x.gif")
         elif id_array[num] == 800:
-            idImage_array[num] = os.path.join(path, "01d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "01d@2x.gif")
         elif id_array[num] == 801:
-            idImage_array[num] = os.path.join(path, "02d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "02d@2x.gif")
         elif id_array[num] == 802:
-            idImage_array[num] = os.path.join(path, "03d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "03d@2x.gif")
         elif id_array[num] == 803 or id_array[num] == 804:
-            idImage_array[num] = os.path.join(path, "04d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "04d@2x.gif")
         else:
             logging.error("Invalid weather ID")
 
