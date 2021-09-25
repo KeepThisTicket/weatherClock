@@ -607,7 +607,7 @@ while running:
                         if (i in range(7,12)):
                             bg_windtext[i-1].clear()
                             bg_windtext[i-1].penup()
-                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - 50 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - 65 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
                             bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", temperature_text_font_size, ""))
                 temp_array_was[j] = temp_array[j]
                 temp_feel_array_was[j] = temp_feel_array[j]
