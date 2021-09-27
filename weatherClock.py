@@ -54,6 +54,9 @@ try:
     minute_hand_color = "yellow"
     second_hand = 75
     second_hand_color = "gray"
+    wind_text_left_shift = 50
+    wind_text_right_shift = 65
+    wind_text_no_measure_text = False
     
     for opt, arg in options:
         if opt in ['-a', '--apikey']:
@@ -121,6 +124,9 @@ try:
         minute_color = settings.get('MinuteColor')
         second_hand = int(settings.get('SecondHand'))
         second_color = settings.get('SecondColor')
+        wind_text_left_shift = int(settings.get('WindTextLeftShift'))
+        wind_text_right_shift = int(settings.get('WindTextRightShift'))
+        wind_text_no_measure_text = settings.get('WindTextNoMeasureText').lower() in ['1', 'true']
         
 except FileNotFoundError:
     print("'settings.json' file not found. Using command line parameters.")
@@ -602,12 +608,15 @@ while running:
                         if (i in range(1,6)):
                             bg_windtext[i-1].clear()
                             bg_windtext[i-1].penup()
-                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift + 50 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
-                            bg_windtext[i-1].write(str(wind_array[j]) + " km/h", align="left", font=("Verdana", temperature_text_font_size, ""))
+                            kmh = " km/h"
+                            if (wind_text_no_measure_text):
+                                kmh = ""
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift + wind_text_right_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="left", font=("Verdana", temperature_text_font_size, ""))
                         if (i in range(7,12)):
                             bg_windtext[i-1].clear()
                             bg_windtext[i-1].penup()
-                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - 65 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - wind_text_left_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
                             bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", temperature_text_font_size, ""))
                 temp_array_was[j] = temp_array[j]
                 temp_feel_array_was[j] = temp_feel_array[j]

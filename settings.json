@@ -28,5 +28,8 @@
   "MinuteHand": "170",
   "MinuteColor": "yellow",
   "SecondHand": "75",
-  "SecondColor": "gray"
+  "SecondColor": "gray",
+  "WindTextLeftShift": "50",
+  "WindTextRightShift": "65",
+  "WindTextNoMeasureText": "False"
 }
