@@ -9,9 +9,16 @@ import sys
 import os
 import getopt
 from datetime import datetime, timedelta
-from pynput.keyboard import Key, Controller
+from pynput.keyboard import Key
+from pynput.keyboard import Controller as KController
+from pynput.mouse import Button
+from pynput.mouse import Controller as MController
 
-keyboard = Controller()
+keyboard = KController()
+mouse = MController()
+
+# move the mouse in the topleft corner - it look better than it would be "in front of"
+mouse.position = (0, 0)
 
 path = os.path.dirname(os.path.realpath(__file__))
 
