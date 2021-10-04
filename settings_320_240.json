@@ -9,8 +9,8 @@
   "TemperatureValues": "True", 
   "WindValues": "True", 
   "ValuesColor": "gray",
-  "GlobalXShift": "-15",
-  "GlobalYShift": "15",
+  "GlobalXShift": "-32",
+  "GlobalYShift": "5",
   "WeatherTextDescription": "-10",
   "WeatherTextData": "10",
   "WeatherTextVertSpacing": "17",
@@ -28,5 +28,8 @@
   "MinuteHand": "70",
   "MinuteColor": "yellow",
   "SecondHand": "85",
-  "SecondColor": "gray"
+  "SecondColor": "gray",
+  "WindTextLeftShift": "50",
+  "WindTextRightShift": "45",
+  "WindTextNoMeasureText": "False"
 }
