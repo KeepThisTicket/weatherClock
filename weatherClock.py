@@ -197,33 +197,14 @@ degree_sign = u"\N{DEGREE SIGN}"
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
 
-deg_to_radians = 0.0174533
-hour_x = [0] * 12
-hour_y = [0] * 12
-hour_x[0] = math.cos(60*deg_to_radians)*radius
-hour_y[0] = math.sin(60*deg_to_radians)*radius
-hour_x[1] = math.cos(30*deg_to_radians)*radius
-hour_y[1] = math.sin(30*deg_to_radians)*radius
-hour_x[2] = math.cos(0*deg_to_radians)*radius
-hour_y[3] = math.sin(0*deg_to_radians)*radius
-hour_x[3] = math.cos(-30*deg_to_radians)*radius
-hour_y[3] = math.sin(-30*deg_to_radians)*radius
-hour_x[4] = math.cos(-60*deg_to_radians)*radius
-hour_y[4] = math.sin(-60*deg_to_radians)*radius
-hour_x[5] = math.cos(-90*deg_to_radians)*radius
 hour_y[5] = math.sin(-90*deg_to_radians)*radius
-hour_x[6] = math.cos(-120*deg_to_radians)*radius
-hour_y[6] = math.sin(-120*deg_to_radians)*radius
-hour_x[7] = math.cos(-150*deg_to_radians)*radius
-hour_y[7] = math.sin(-150*deg_to_radians)*radius
-hour_x[8] = math.cos(-180*deg_to_radians)*radius
-hour_y[8] = math.sin(-180*deg_to_radians)*radius
-hour_x[9] = math.cos(-210*deg_to_radians)*radius
-hour_y[9] = math.sin(-210*deg_to_radians)*radius
-hour_x[10] = math.cos(-240*deg_to_radians)*radius
-hour_y[10] = math.sin(-240*deg_to_radians)*radius
-hour_x[11] = math.cos(-270*deg_to_radians)*radius
-hour_y[11] = math.sin(-270*deg_to_radians)*radius
+hour_x = []
+hour_y = []
+
+for i in range(60, -300, -30):
+    i_r = math.radians(i)
+    hour_x.append((math.cos(i_r)*radius))
+    hour_y.append((math.sin(i_r)*radius))
 
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
