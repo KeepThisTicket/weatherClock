@@ -9,9 +9,16 @@ import sys
 import os
 import getopt
 from datetime import datetime, timedelta
-from pynput.keyboard import Key, Controller
+from pynput.keyboard import Key
+from pynput.keyboard import Controller as KController
+from pynput.mouse import Button
+from pynput.mouse import Controller as MController
 
-keyboard = Controller()
+keyboard = KController()
+mouse = MController()
+
+# move the mouse in the topleft corner - it look better than it would be "in front of"
+mouse.position = (0, 0)
 
 path = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,10 +32,39 @@ try:
     if options:
         print(f"Options: {options}")
     api_key = False
+    theme = "default"
     log_level = False
     latitude = False
     longitude = False
     units = False
+    temperature_values = False 
+    wind_values = False
+    values_color = "gray"
+    global_x_shift = 0
+    global_y_shift = 0
+    weather_text_description = -30
+    weather_text_data = 30
+    weather_text_vert_spacing = 40
+    temperature_text_vert_spacing = -9
+    temperature_text_horz_spacing = 11
+    temperature_text_font_size = 11
+    weather_text_description_font_size = 20
+    weather_text_data_font_size = 19
+    hourly_touch_size = 50
+    radius = 265
+    wn_title = "WeatherClock 0.0.0"
+    divider_start = -125
+    divider_end = 275
+    hour_hand = 100
+    hour_hand_color = "white"
+    minute_hand = 170
+    minute_hand_color = "yellow"
+    second_hand = 75
+    second_hand_color = "gray"
+    wind_text_left_shift = 50
+    wind_text_right_shift = 65
+    wind_text_no_measure_text = False
+    
     for opt, arg in options:
         if opt in ['-a', '--apikey']:
             api_key = arg
@@ -58,6 +94,7 @@ try:
         if not api_key:
             api_key_setting = settings.get('ApiKey')
             api_key = api_key_setting if api_key_setting else False
+        theme = settings.get('Theme')    
         if not log_level:
             log_level = settings.get('LogLevel')
         if not latitude:
@@ -66,6 +103,38 @@ try:
             longitude = settings.get('Longitude')
         if not units:
             units = settings.get('Units')
+        if not temperature_values:
+            temperature_values = settings.get('TemperatureValues').lower() in ['1', 'true']
+        if not wind_values:
+            wind_values = settings.get('WindValues').lower() in ['1', 'true']
+        values_color = settings.get('ValuesColor')
+        global_x_shift = int(settings.get('GlobalXShift'))
+        global_y_shift = int(settings.get('GlobalYShift'))
+        weather_text_description = int(settings.get('WeatherTextDescription'))
+        weather_text_data = int(settings.get('WeatherTextData'))
+        weather_text_vert_spacing = int(settings.get('WeatherTextVertSpacing'))
+        temperature_text_vert_spacing = int(settings.get('TemperatureTextVertSpacing'))
+        temperature_text_horz_spacing = int(settings.get('TemperatureTextHorzSpacing'))
+        temperature_text_font_size = int(settings.get('TemperatureTextFontSize'))
+        weather_text_description_font_size = int(settings.get('WeatherTextDataFontSize'))
+        weather_text_data_font_size = int(settings.get('WeatherTextDataFontSize'))
+        # determines radius for user touch when going into hourly detail mode
+        hourly_touch_size = int(settings.get('HourlyTouchSize'))
+        # determines how big clock is
+        radius = int(settings.get('Radius'))
+        wn_title = settings.get('Title')
+        divider_start = int(settings.get('DividerStart'))
+        divider_end = int(settings.get('DividerEnd'))
+        hour_hand = int(settings.get('HourHand'))
+        hour_color = settings.get('HourColor')
+        minute_hand = int(settings.get('MinuteHand'))
+        minute_color = settings.get('MinuteColor')
+        second_hand = int(settings.get('SecondHand'))
+        second_color = settings.get('SecondColor')
+        wind_text_left_shift = int(settings.get('WindTextLeftShift'))
+        wind_text_right_shift = int(settings.get('WindTextRightShift'))
+        wind_text_no_measure_text = settings.get('WindTextNoMeasureText').lower() in ['1', 'true']
+        
 except FileNotFoundError:
     print("'settings.json' file not found. Using command line parameters.")
 
@@ -95,8 +164,14 @@ url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 weatherUpdatePeriod = 10
 
 temp_array = [0] * 12
+temp_feel_array = [0] * 12
+wind_array = [0] * 12
+temp_array_was = [0] * 12
+temp_feel_array_was = [0] * 12
+wind_array_was = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
+idImage_array_was = [""] * 12
 hour_cursor = int(time.strftime('%I'))
 
 res = requests.get(url)
@@ -113,11 +188,6 @@ cursor_y = 0
 
 weatherText = turtle.Turtle()
 weatherText.hideturtle()
-weatherText_Description = -30
-weatherText_Data = 30
-weatherText_vertSpacing = 40
-weatherText_DescriptionFontSize = 20
-weatherText_DataFontSize = 19
 
 weatherDividerPen = turtle.Turtle()
 weatherDividerPen.hideturtle()
@@ -126,25 +196,34 @@ degree_sign = u"\N{DEGREE SIGN}"
 
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
-# determines radius for user touch when going into hourly detail mode
-hourlyTouchSize = 50
 
 deg_to_radians = 0.0174533
-# determines how big clock is
-radius = 265
-hour1_x, hour1_y = math.cos(60*deg_to_radians)*radius, math.sin(60*deg_to_radians)*radius
-hour2_x, hour2_y = math.cos(30*deg_to_radians)*radius, math.sin(30*deg_to_radians)*radius
-hour3_x, hour3_y = math.cos(0*deg_to_radians)*radius, math.sin(0*deg_to_radians)*radius
-hour4_x, hour4_y = math.cos(-30*deg_to_radians)*radius, math.sin(-30*deg_to_radians)*radius
-hour5_x, hour5_y = math.cos(-60*deg_to_radians)*radius, math.sin(-60*deg_to_radians)*radius
-hour6_x, hour6_y = math.cos(-90*deg_to_radians)*radius, math.sin(-90*deg_to_radians)*radius
-hour7_x, hour7_y = math.cos(-120*deg_to_radians)*radius, math.sin(-120*deg_to_radians)*radius
-hour8_x, hour8_y = math.cos(-150*deg_to_radians)*radius, math.sin(-150*deg_to_radians)*radius
-hour9_x, hour9_y = math.cos(-180*deg_to_radians)*radius, math.sin(-180*deg_to_radians)*radius
-hour10_x, hour10_y = math.cos(-210*deg_to_radians)*radius, math.sin(-210*deg_to_radians)*radius
-hour11_x, hour11_y = math.cos(-240*deg_to_radians)*radius, math.sin(-240*deg_to_radians)*radius
-hour12_x, hour12_y = math.cos(-270*deg_to_radians)*radius, math.sin(-270*deg_to_radians)*radius
-
+hour_x = [0] * 12
+hour_y = [0] * 12
+hour_x[0] = math.cos(60*deg_to_radians)*radius
+hour_y[0] = math.sin(60*deg_to_radians)*radius
+hour_x[1] = math.cos(30*deg_to_radians)*radius
+hour_y[1] = math.sin(30*deg_to_radians)*radius
+hour_x[2] = math.cos(0*deg_to_radians)*radius
+hour_y[3] = math.sin(0*deg_to_radians)*radius
+hour_x[3] = math.cos(-30*deg_to_radians)*radius
+hour_y[3] = math.sin(-30*deg_to_radians)*radius
+hour_x[4] = math.cos(-60*deg_to_radians)*radius
+hour_y[4] = math.sin(-60*deg_to_radians)*radius
+hour_x[5] = math.cos(-90*deg_to_radians)*radius
+hour_y[5] = math.sin(-90*deg_to_radians)*radius
+hour_x[6] = math.cos(-120*deg_to_radians)*radius
+hour_y[6] = math.sin(-120*deg_to_radians)*radius
+hour_x[7] = math.cos(-150*deg_to_radians)*radius
+hour_y[7] = math.sin(-150*deg_to_radians)*radius
+hour_x[8] = math.cos(-180*deg_to_radians)*radius
+hour_y[8] = math.sin(-180*deg_to_radians)*radius
+hour_x[9] = math.cos(-210*deg_to_radians)*radius
+hour_y[9] = math.sin(-210*deg_to_radians)*radius
+hour_x[10] = math.cos(-240*deg_to_radians)*radius
+hour_y[10] = math.sin(-240*deg_to_radians)*radius
+hour_x[11] = math.cos(-270*deg_to_radians)*radius
+hour_y[11] = math.sin(-270*deg_to_radians)*radius
 
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
@@ -179,30 +258,9 @@ def get_mouse_click_coordinate(x, y):
 
     hour_touched = -1
 
-    if touch_in_box(cursor_x, cursor_y, hour1_x, hour1_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 1
-    elif touch_in_box(cursor_x, cursor_y, hour2_x, hour2_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 2
-    elif touch_in_box(cursor_x, cursor_y, hour3_x, hour3_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 3
-    elif touch_in_box(cursor_x, cursor_y, hour4_x, hour4_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 4
-    elif touch_in_box(cursor_x, cursor_y, hour5_x, hour5_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 5
-    elif touch_in_box(cursor_x, cursor_y, hour6_x, hour6_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 6
-    elif touch_in_box(cursor_x, cursor_y, hour7_x, hour7_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 7
-    elif touch_in_box(cursor_x, cursor_y, hour8_x, hour8_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 8
-    elif touch_in_box(cursor_x, cursor_y, hour9_x, hour9_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 9
-    elif touch_in_box(cursor_x, cursor_y, hour10_x, hour10_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 10
-    elif touch_in_box(cursor_x, cursor_y, hour11_x, hour11_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 11
-    elif touch_in_box(cursor_x, cursor_y, hour12_x, hour12_y, hourlyTouchSize, hourlyTouchSize):
-        hour_touched = 12
+    for i in range(0, 12):
+        if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
+            hour_touched = i + 1
     tomorrow_date = None
     if hour_touched >= 0:
         logging.debug(f"hour {hour_touched} WAS TOUCHED !")
@@ -234,81 +292,81 @@ def get_mouse_click_coordinate(x, y):
         # without this there is some weird line
         weatherText.penup()
 
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing*3)
+        weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.color("white")
         # day of the week
-        weatherText.write("Day", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.write("Day", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing*3)
+        weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         if not tomorrow_date:
             weatherText.write(datetime.today().strftime('%A'),
-                              align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
             weatherText.write(tomorrow_date.strftime('%A'),
-                              align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # hour of the day
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing*2)
-        weatherText.write("hour", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
+        weatherText.write("hour", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing*2)
+        weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         weatherText.write(str(hour_touched) + " " + touched_meridiem,
-                          align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # temperature
-        weatherText.goto(weatherText_Description, weatherText_vertSpacing)
-        weatherText.write("temp", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing + global_y_shift)
+        weatherText.write("temp", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, weatherText_vertSpacing)
+        weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing + global_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hours_ahead]["temp"], 1)) + degree_sign,
-                          align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # Feels like
-        weatherText.goto(weatherText_Description, 0)
+        weatherText.goto(weather_text_description + global_x_shift, global_y_shift)
         weatherText.write("Feels like", align="right",
-                          font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+                          font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, 0)
+        weatherText.goto(weather_text_data + global_x_shift, global_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hours_ahead]["feels_like"], 1)) + degree_sign,
-                          align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # POP
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing)
-        weatherText.write("POP", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing + global_y_shift)
+        weatherText.write("POP", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing)
+        weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing + global_y_shift)
         weatherText.write(str(int(data["hourly"][hours_ahead]["pop"]*100)) + " %",
-                          align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # Rain
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing*2)
-        weatherText.write("Rain", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing * 2 + global_y_shift)
+        weatherText.write("Rain", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing*2)
+        weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing * 2 + global_y_shift)
         if 'rain' not in data["hourly"][hours_ahead]:
-            weatherText.write("--", align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+            weatherText.write("--", align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
             weatherText.write(str(data["hourly"][hours_ahead]["rain"]["1h"]) + " mm",
-                              align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # Wind
-        weatherText.goto(weatherText_Description, -weatherText_vertSpacing*3)
-        weatherText.write("Wind", align="right", font=("Verdana", weatherText_DescriptionFontSize, "bold"))
+        weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing * 3 + global_y_shift)
+        weatherText.write("Wind", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
-        weatherText.goto(weatherText_Data, -weatherText_vertSpacing*3)
+        weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.write(str(data["hourly"][hours_ahead]["wind_speed"]) + " km/h",
-                          align="left", font=("Verdana", weatherText_DataFontSize, "bold"))
+                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         weatherText.hideturtle()
 
         weatherDividerPen.pensize(3)
 
         weatherDividerPen.penup()
-        weatherDividerPen.goto(0, -125)
+        weatherDividerPen.goto(global_x_shift, divider_start + global_y_shift)
         weatherDividerPen.color("white")
         weatherDividerPen.setheading(90)
         weatherDividerPen.pendown()
-        weatherDividerPen.fd(275)
+        weatherDividerPen.fd(divider_end)
         weatherDividerPen.hideturtle()
 
     elif mode == 1 and touch_in_box(cursor_x, cursor_y, 0, 0, 200, 200):
@@ -352,30 +410,34 @@ def update_forecast():
             logging.debug("rain: " + str(data["hourly"][num]["rain"]))
 
         temp_array[num] = data["hourly"][num]["temp"]
+        temp_feel_array[num] = data["hourly"][num]["feels_like"]
+        wind_array[num] = data["hourly"][num]["wind_speed"]      
         id_array[num] = data["hourly"][num]["weather"][0]["id"]
 
+        path_theme = os.path.join(path, theme)
+
         if 232 >= id_array[num] >= 200:
-            idImage_array[num] = os.path.join(path, "11d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "11d@2x.gif")
         elif 321 >= id_array[num] >= 300:
-            idImage_array[num] = os.path.join(path, "09d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
         elif 504 >= id_array[num] >= 500:
-            idImage_array[num] = os.path.join(path, "10d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "10d@2x.gif")
         elif id_array[num] == 511:
-            idImage_array[num] = os.path.join(path, "13d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
         elif 531 >= id_array[num] >= 520:
-            idImage_array[num] = os.path.join(path, "09d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
         elif 622 >= id_array[num] >= 600:
-            idImage_array[num] = os.path.join(path, "13d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
         elif 781 >= id_array[num] >= 701:
-            idImage_array[num] = os.path.join(path, "50d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "50d@2x.gif")
         elif id_array[num] == 800:
-            idImage_array[num] = os.path.join(path, "01d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "01d@2x.gif")
         elif id_array[num] == 801:
-            idImage_array[num] = os.path.join(path, "02d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "02d@2x.gif")
         elif id_array[num] == 802:
-            idImage_array[num] = os.path.join(path, "03d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "03d@2x.gif")
         elif id_array[num] == 803 or id_array[num] == 804:
-            idImage_array[num] = os.path.join(path, "04d@2x.gif")
+            idImage_array[num] = os.path.join(path_theme, "04d@2x.gif")
         else:
             logging.error("Invalid weather ID")
 
@@ -390,10 +452,10 @@ def update_forecast():
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.screensize()
-# wn.setup(width=600, height=600)
+#wn.setup(width=600, height=600)
 # Make full screen
 wn.setup(width=1.0, height=1.0)
-wn.title("WeatherClock 0.0.0")
+wn.title(wn_title)
 # turns off the animation, so you can't see anything when it is drawing
 wn.tracer(0)
 
@@ -404,41 +466,24 @@ pen.hideturtle()
 pen.speed(0)
 pen.pensize(3)
 
-bg_hour1 = turtle.Turtle()
-bg_hour1.goto(hour1_x, hour1_y)
+bg_hour = []
+bg_hourtext = []
+bg_windtext = []
 
-bg_hour2 = turtle.Turtle()
-bg_hour2.goto(hour2_x, hour2_y)
+for i in range(0, 12):
+    bg_hour_i = turtle.Turtle()
+    bg_hour_i.goto(hour_x[i] + global_x_shift, hour_y[i] + global_y_shift)
+    bg_hour.append(bg_hour_i)
 
-bg_hour3 = turtle.Turtle()
-bg_hour3.goto(hour3_x, hour3_y)
+    bg_hourtext_i = turtle.Turtle()
+    bg_hourtext_i.color(values_color)
+    bg_hourtext_i.hideturtle()
+    bg_hourtext.append(bg_hourtext_i)
 
-bg_hour4 = turtle.Turtle()
-bg_hour4.goto(hour4_x, hour4_y)
-
-bg_hour5 = turtle.Turtle()
-bg_hour5.goto(hour5_x, hour5_y)
-
-bg_hour6 = turtle.Turtle()
-bg_hour6.goto(hour6_x, hour6_y)
-
-bg_hour7 = turtle.Turtle()
-bg_hour7.goto(hour7_x, hour7_y)
-
-bg_hour8 = turtle.Turtle()
-bg_hour8.goto(hour8_x, hour8_y)
-
-bg_hour9 = turtle.Turtle()
-bg_hour9.goto(hour9_x, hour9_y)
-
-bg_hour10 = turtle.Turtle()
-bg_hour10.goto(hour10_x, hour10_y)
-
-bg_hour11 = turtle.Turtle()
-bg_hour11.goto(hour11_x, hour11_y)
-
-bg_hour12 = turtle.Turtle()
-bg_hour12.goto(hour12_x, hour12_y)
+    bg_windtext_i = turtle.Turtle()
+    bg_windtext_i.color(values_color)
+    bg_windtext_i.hideturtle()
+    bg_windtext.append(bg_windtext_i)
 
 s = 0
 # time.sleep(10)
@@ -450,34 +495,34 @@ def draw_clock(hour, minute, second, pen):
 
     # Draw the hour hand
     pen.penup()
-    pen.goto(0, 0)
-    pen.color("white")
+    pen.goto(global_x_shift, global_y_shift)
+    pen.color(hour_color)
     pen.pensize(6)
     pen.setheading(90)
     angle = (hour / 12) * 360 + (minute/60) * 30
     pen.rt(angle)
     pen.pendown()
-    pen.fd(100)
+    pen.fd(hour_hand)
 
     # Draw the minute hand
     pen.penup()
-    pen.goto(0, 0)
-    pen.color("white")
+    pen.goto(global_x_shift, global_y_shift)
+    pen.color(minute_color)
     pen.setheading(90)
     angle = (minute / 60.0) * 360  # optional + (s/60) * 6
     pen.rt(angle)
     pen.pendown()
-    pen.fd(170)
+    pen.fd(minute_hand)
 
     # Draw the second hand
     pen.penup()
-    pen.goto(0, 0)
-    pen.color("red")
+    pen.goto(global_x_shift, global_y_shift)
+    pen.color(second_color)
     pen.setheading(90)
     angle = (second / 60) * 360
     pen.rt(angle)
     pen.pendown()
-    pen.fd(75)
+    pen.fd(second_hand)
 
 # makes the program fullscreen when you launch it
 keyboard.press(Key.alt)
@@ -502,6 +547,8 @@ top_window.protocol("WM_DELETE_WINDOW", on_close)
 top_window.overrideredirect(True)
 wn.listen()
 
+needUpdate1 = True    
+
 while running:
     try:
         logging.debug("\n... Main Loop Start ...\n")
@@ -512,77 +559,75 @@ while running:
 
         logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
 
+        needUpdate = False
+        if (needUpdate1):
+            needUpdate = True
+            needUpdate1 = False
+        
         # every x minutes, fetch new weather data
         if m % weatherUpdatePeriod == 0 and s == 0:
             res = requests.get(url)
             data = res.json()
             logging.debug("** FETCHED NEW DATA **")
+            needUpdate = True
 
         if mode == 0:
             draw_clock(h, m, s, pen)
             update_forecast()
 
             logging.debug(f"hour_cursor: {str(hour_cursor)}")
-
-            if 1-hour_cursor < 0:
-                bg_hour1.shape(idImage_array[12 - abs(1 - hour_cursor)])
-            else:
-                bg_hour1.shape(idImage_array[1 - hour_cursor])
-
-            if 2-hour_cursor < 0:
-                bg_hour2.shape(idImage_array[12 - abs(2 - hour_cursor)])
-            else:
-                bg_hour2.shape(idImage_array[2 - hour_cursor])
-
-            if 3-hour_cursor < 0:
-                bg_hour3.shape(idImage_array[12 - abs(3 - hour_cursor)])
-            else:
-                bg_hour3.shape(idImage_array[3 - hour_cursor])
-
-            if 4-hour_cursor < 0:
-                bg_hour4.shape(idImage_array[12 - abs(4 - hour_cursor)])
-            else:
-                bg_hour4.shape(idImage_array[4 - hour_cursor])
-
-            if 5-hour_cursor < 0:
-                bg_hour5.shape(idImage_array[12 - abs(5 - hour_cursor)])
-            else:
-                bg_hour5.shape(idImage_array[5 - hour_cursor])
-
-            if 6-hour_cursor < 0:
-                bg_hour6.shape(idImage_array[12 - abs(6 - hour_cursor)])
-            else:
-                bg_hour6.shape(idImage_array[6 - hour_cursor])
-
-            if 7-hour_cursor < 0:
-                bg_hour7.shape(idImage_array[12 - abs(7 - hour_cursor)])
-            else:
-                bg_hour7.shape(idImage_array[7 - hour_cursor])
-
-            if 8-hour_cursor < 0:
-                bg_hour8.shape(idImage_array[12 - abs(8 - hour_cursor)])
-            else:
-                bg_hour8.shape(idImage_array[8 - hour_cursor])
-
-            if 9-hour_cursor < 0:
-                bg_hour9.shape(idImage_array[12 - abs(9 - hour_cursor)])
-            else:
-                bg_hour9.shape(idImage_array[9 - hour_cursor])
-
-            if 10-hour_cursor < 0:
-                bg_hour10.shape(idImage_array[12 - abs(10 - hour_cursor)])
-            else:
-                bg_hour10.shape(idImage_array[10 - hour_cursor])
-
-            if 11-hour_cursor < 0:
-                bg_hour11.shape(idImage_array[12 - abs(11 - hour_cursor)])
-            else:
-                bg_hour11.shape(idImage_array[11 - hour_cursor])
-
-            if 12-hour_cursor < 0:
-                bg_hour12.shape(idImage_array[12 - abs(12 - hour_cursor)])
-            else:
-                bg_hour12.shape(idImage_array[12 - hour_cursor])
+            
+            for i in range(1, 13):
+                if (i - hour_cursor < 0):
+                    j = 12 - abs(i - hour_cursor)
+                else:
+                    j = i - hour_cursor
+                if(idImage_array[j] != idImage_array_was[j]):
+                    bg_hour[i-1].shape(idImage_array[j])
+                    idImage_array_was[j] = idImage_array[j]
+                    
+                if ((needUpdate) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
+                        (wind_array[j] != wind_array_was[j])):
+                    if (temperature_values):
+                        bg_hourtext[i-1].clear()
+                        bg_hourtext[i-1].penup()
+                        x_shift = 0
+                        y_shift = 0
+                        if (("04d@2x.gif" in idImage_array[j]) or ("02d@2x.gif" in idImage_array[j])):
+                            x_shift = -7
+                            y_shift = -8
+                        if ("11d@2x.gif" in idImage_array[j]):
+                            x_shift = -9
+                            y_shift = 3
+                        if (("09d@2x.gif" in idImage_array[j]) or  ("10d@2x.gif" in idImage_array[j])):
+                            x_shift = -6
+                            y_shift = 3
+                        if ("03d@2x.gif" in idImage_array[j]):
+                            x_shift = -3
+                            y_shift = -5
+                        if (temp_array[j] < 10):
+                            x_shift = x_shift + 4
+                        bg_hourtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing + x_shift - 20 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                        v = int(round(temp_array[j]))
+                        v2 = int(round(temp_feel_array[j]))
+                        bg_hourtext[i-1].write(str(round(temp_array[j])), align="left", font=("Verdana", temperature_text_font_size, "bold"))
+                    if  (wind_values):   
+                        if (i in range(1,6)):
+                            bg_windtext[i-1].clear()
+                            bg_windtext[i-1].penup()
+                            kmh = " km/h"
+                            if (wind_text_no_measure_text):
+                                kmh = ""
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift + wind_text_right_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="left", font=("Verdana", temperature_text_font_size, ""))
+                        if (i in range(7,12)):
+                            bg_windtext[i-1].clear()
+                            bg_windtext[i-1].penup()
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - wind_text_left_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", temperature_text_font_size, ""))
+                temp_array_was[j] = temp_array[j]
+                temp_feel_array_was[j] = temp_feel_array[j]
+                wind_array_was[j] = wind_array[j]                    
 
         wn.update()
 
@@ -590,7 +635,7 @@ while running:
         # this returns the coordinate of the press !
         turtle.onscreenclick(get_mouse_click_coordinate)
         logging.debug("MODE:" + str(mode))
-        logging.debug(cursor_x, cursor_y)
+        logging.debug("cursor_x: " + str(cursor_x) + "; cursor_y: " + str(cursor_y))
 
         if cursor_x != -1 and cursor_y != -1:
             logging.debug("screen was touched")
