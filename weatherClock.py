@@ -197,7 +197,6 @@ degree_sign = u"\N{DEGREE SIGN}"
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
 
-hour_y[5] = math.sin(-90*deg_to_radians)*radius
 hour_x = []
 hour_y = []
 
