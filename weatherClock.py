@@ -52,7 +52,7 @@ try:
     weather_text_data_font_size = 19
     hourly_touch_size = 50
     radius = 265
-    wn_title = "WeatherClock 0.0.0"
+    wn_title = "WeatherClock 0.0.1  "
     divider_start = -125
     divider_end = 275
     hour_hand = 100
@@ -122,7 +122,7 @@ try:
         hourly_touch_size = int(settings.get('HourlyTouchSize'))
         # determines how big clock is
         radius = int(settings.get('Radius'))
-        wn_title = settings.get('Title')
+        wn_title += settings.get('Title')
         divider_start = int(settings.get('DividerStart'))
         divider_end = int(settings.get('DividerEnd'))
         hour_hand = int(settings.get('HourHand'))
@@ -143,9 +143,9 @@ if not api_key:
 
 if log_level.lower() == 'debug':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-elif log_level.lower() == 'info' or log_level.lower() == 'information':
+elif log_level.lower()[:4] == 'info': #'info' or 'information':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-elif log_level.lower() == 'warn' or log_level.lower() == 'warning':
+elif log_level.lower()[:4] == 'warn' #'warn' == 'warning':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 elif log_level.lower() == 'error':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
@@ -241,6 +241,7 @@ def get_mouse_click_coordinate(x, y):
     for i in range(0, 12):
         if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
             hour_touched = i + 1
+            break
     tomorrow_date = None
     if hour_touched >= 0:
         logging.debug(f"hour {hour_touched} WAS TOUCHED !")
@@ -261,10 +262,13 @@ def get_mouse_click_coordinate(x, y):
         if hours_ahead >= 0:
             logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
-    if mode == 0 and hour_touched != -1:
+    if hour_touched != -1:
+        if mode == 1:
+            weatherText.clear()  # remove hourly details from screen
+            weatherDividerPen.clear()
+        
         # go to hourly detail mode
         mode = 1
-        # ? to do?: add the button touches for different hours
 
         # remove the clock hands from showing
         pen.clear()
@@ -625,7 +629,7 @@ while running:
         pen.clear()
 
     except KeyboardInterrupt:
-        print("Exiting WeatherClock.")
+        logging.info("Exiting WeatherClock.")
         exit(0)
 
 # if you don't do this, window will open and close immediately, should be the last line of your program
