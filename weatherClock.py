@@ -147,7 +147,7 @@ if log_level.lower() == 'debug':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 elif log_level.lower()[:4] == 'info': #'info' or 'information':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-elif log_level.lower()[:4] == 'warn' #'warn' == 'warning':
+elif log_level.lower()[:4] == 'warn': #'warn' == 'warning':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 elif log_level.lower() == 'error':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
