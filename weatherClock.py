@@ -295,7 +295,7 @@ def get_mouse_click_coordinate(x, y):
         weatherText.write("hour", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
-        if use_Hour24:
+        if use_hour24:
             currentHour24 = int(time.strftime("%I"))
             if currentHour24 + hoursAhead > 23:
                 if hourTouched == 12:
