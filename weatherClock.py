@@ -256,11 +256,18 @@ def get_mouse_click_coordinate(x, y):
             else:
                 touched_meridiem = "PM"
         else:
+            touched_meridiem = current_meridiem
             if hour_cursor == 12:
                 hours_ahead = hour_touched
             else:
                 hours_ahead = hour_touched - hour_cursor
-            touched_meridiem = current_meridiem
+                if hour_touched == 12:
+                    if current_meridiem == "PM":
+                        tomorrow_date = datetime.today() + timedelta(days=1)
+                        touched_meridiem = "AM"
+                    else:
+                        touched_meridiem = "PM"
+
         if hours_ahead >= 0:
             logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
@@ -296,16 +303,16 @@ def get_mouse_click_coordinate(x, y):
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         if use_hour24:
-            currentHour24 = int(time.strftime("%I"))
-            if currentHour24 + hoursAhead > 23:
-                if hourTouched == 12:
+            currentHour24 = int(time.strftime("%H"))
+            if currentHour24 + hours_ahead > 23:
+                if hour_touched == 12:
                     weatherText.write("0",
                                     align="left", font=("Verdana", weather_text_data_font_size, "bold"))
                 else:
                     weatherText.write(str(hour_touched),
                                     align="left", font=("Verdana", weather_text_data_font_size, "bold"))
             else:
-                weatherText.write(str(currentHour24 + hoursAhead),
+                weatherText.write(str(currentHour24 + hours_ahead),
                                 align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
             weatherText.write(str(hour_touched) + " " + touched_meridiem,
@@ -562,7 +569,10 @@ while running:
         m = int(time.strftime("%M"))
         s = int(time.strftime("%S"))
 
-        logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
+        if use_hour24:
+            logging.debug(f"{time.strftime("%H")}:{str(m)}:{str(s)}")
+        else:
+            logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
 
         needUpdate = False
         if (needUpdate1):
