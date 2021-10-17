@@ -22,7 +22,6 @@ mouse.position = (0, 0)
 
 path = os.path.dirname(os.path.realpath(__file__))
 
-
 print("Starting WeatherClock...")
 try:
     options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', [
@@ -39,6 +38,7 @@ try:
     units = False
     temperature_values = False 
     wind_values = False
+    use_hour24 = False
     values_color = "gray"
     global_x_shift = 0
     global_y_shift = 0
@@ -52,7 +52,7 @@ try:
     weather_text_data_font_size = 19
     hourly_touch_size = 50
     radius = 265
-    wn_title = "WeatherClock 0.0.0"
+    wn_title = "WeatherClock 0.0.1  "
     divider_start = -125
     divider_end = 275
     hour_hand = 100
@@ -104,9 +104,11 @@ try:
         if not units:
             units = settings.get('Units')
         if not temperature_values:
-            temperature_values = settings.get('TemperatureValues').lower() in ['1', 'true']
+            temperature_values = settings.get('TemperatureValues').lower() in ['1', 'true', 'on']
         if not wind_values:
-            wind_values = settings.get('WindValues').lower() in ['1', 'true']
+            wind_values = settings.get('WindValues').lower() in ['1', 'true', 'on']
+        if not use_hour24:
+            use_hour24 = settings.get('UseHour24').lower() in ['1', 'true', 'on']
         values_color = settings.get('ValuesColor')
         global_x_shift = int(settings.get('GlobalXShift'))
         global_y_shift = int(settings.get('GlobalYShift'))
@@ -122,7 +124,7 @@ try:
         hourly_touch_size = int(settings.get('HourlyTouchSize'))
         # determines how big clock is
         radius = int(settings.get('Radius'))
-        wn_title = settings.get('Title')
+        wn_title += settings.get('Title')
         divider_start = int(settings.get('DividerStart'))
         divider_end = int(settings.get('DividerEnd'))
         hour_hand = int(settings.get('HourHand'))
@@ -143,9 +145,9 @@ if not api_key:
 
 if log_level.lower() == 'debug':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
-elif log_level.lower() == 'info' or log_level.lower() == 'information':
+elif log_level.lower()[:4] == 'info': #'info' or 'information':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
-elif log_level.lower() == 'warn' or log_level.lower() == 'warning':
+elif log_level.lower()[:4] == 'warn': #'warn' == 'warning':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.WARNING)
 elif log_level.lower() == 'error':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
@@ -241,9 +243,10 @@ def get_mouse_click_coordinate(x, y):
     for i in range(0, 12):
         if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
             hour_touched = i + 1
+            break
     tomorrow_date = None
     if hour_touched >= 0:
-        logging.debug(f"hour {hour_touched} WAS TOUCHED !")
+        logging.debug(f"Hour {hour_touched} WAS TOUCHED !")
 
         if hour_touched < hour_cursor and not hour_cursor == 12:
             hours_ahead = 12-hour_cursor+hour_touched
@@ -253,28 +256,37 @@ def get_mouse_click_coordinate(x, y):
             else:
                 touched_meridiem = "PM"
         else:
+            touched_meridiem = current_meridiem
             if hour_cursor == 12:
                 hours_ahead = hour_touched
             else:
                 hours_ahead = hour_touched - hour_cursor
-            touched_meridiem = current_meridiem
+                if hour_touched == 12:
+                    if current_meridiem == "PM":
+                        tomorrow_date = datetime.today() + timedelta(days=1)
+                        touched_meridiem = "AM"
+                    else:
+                        touched_meridiem = "PM"
+
         if hours_ahead >= 0:
             logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
 
-    if mode == 0 and hour_touched != -1:
+    if hour_touched != -1:
+        if mode == 1:
+            weatherText.clear()  # remove hourly details from screen
+            weatherDividerPen.clear()
+        else:
+            pen.clear() # remove the clock hands from showing
+        
         # go to hourly detail mode
         mode = 1
-        # ? to do?: add the button touches for different hours
-
-        # remove the clock hands from showing
-        pen.clear()
 
         # without this there is some weird line
         weatherText.penup()
-
-        weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.color("white")
+
         # day of the week
+        weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.write("Day", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
@@ -290,8 +302,21 @@ def get_mouse_click_coordinate(x, y):
         weatherText.write("hour", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
-        weatherText.write(str(hour_touched) + " " + touched_meridiem,
-                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+        if use_hour24:
+            currentHour24 = int(time.strftime("%H"))
+            if currentHour24 + hours_ahead > 23:
+                if hour_touched == 12:
+                    weatherText.write("0",
+                                    align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+                else:
+                    weatherText.write(str(hour_touched),
+                                    align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+            else:
+                weatherText.write(str(currentHour24 + hours_ahead),
+                                align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+        else:
+            weatherText.write(str(hour_touched) + " " + touched_meridiem,
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # temperature
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing + global_y_shift)
@@ -373,18 +398,25 @@ def update_forecast():
     logging.debug("hour_cursor: " + str(hour_cursor))
 
     for num in range(12):
-        # current hour
-        logging.debug("current hour: " + str(hour_cursor) + " " + meridiem)
-        # forecast hour
-        logging.debug("forecast hour: " + str(int(hour_cursor)+num))
-        logging.debug("temperature: " + str(data["hourly"][num]["temp"]))
-        logging.debug("feels like: " + str(data["hourly"][num]["feels_like"]))
-        logging.debug("wind speed: " + str(data["hourly"][num]["wind_speed"]))
-        logging.debug(data["hourly"][num]["weather"][0]["description"])
-        logging.debug("weather ID: " + str(data["hourly"][num]["weather"][0]["id"]))
-        logging.debug("POP: " + str(data["hourly"][num]["pop"]))
+        
+        if use_hour24:
+            currentHour24 = int(time.strftime("%H"))
+            logging.debug("current hour: " + str(currentHour24)) # current hour 24
+            if currentHour24 + num < 24:
+                logging.debug("forecast hour: " + str(currentHour24+num)) # forecast hour 24
+            else:
+                logging.debug("forecast hour: " + str(currentHour24+num-24)) # forecast hour 24
+        else:
+            logging.debug("current hour: " + str(hour_cursor) + " " + meridiem) # current hour 12
+            logging.debug("forecast hour: " + str(int(hour_cursor)+num)) # forecast hour 12
+        logging.debug("temperature: " + str(data["hourly"][num]["temp"])) #temperature real
+        logging.debug("feels like: " + str(data["hourly"][num]["feels_like"])) #temperature feels like
+        logging.debug("wind speed: " + str(data["hourly"][num]["wind_speed"])) #wind speed
+        logging.debug(data["hourly"][num]["weather"][0]["description"]) #description of the air
+        logging.debug("weather ID: " + str(data["hourly"][num]["weather"][0]["id"])) #weather ID
+        logging.debug("POP: " + str(data["hourly"][num]["pop"])) #POP
 
-        if 'rain' not in data["hourly"][num]:
+        if 'rain' not in data["hourly"][num]: #check rain
             logging.debug("no rain data")
         else:
             logging.debug("rain: " + str(data["hourly"][num]["rain"]))
@@ -396,19 +428,19 @@ def update_forecast():
 
         path_theme = os.path.join(path, theme)
 
-        if 232 >= id_array[num] >= 200:
+        if   200 <= id_array[num] <= 232:
             idImage_array[num] = os.path.join(path_theme, "11d@2x.gif")
-        elif 321 >= id_array[num] >= 300:
+        elif 300 <= id_array[num] <= 321:
             idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
-        elif 504 >= id_array[num] >= 500:
+        elif 500 <= id_array[num] <= 504:
             idImage_array[num] = os.path.join(path_theme, "10d@2x.gif")
         elif id_array[num] == 511:
             idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
-        elif 531 >= id_array[num] >= 520:
+        elif 520 <= id_array[num] <= 531:
             idImage_array[num] = os.path.join(path_theme, "09d@2x.gif")
-        elif 622 >= id_array[num] >= 600:
+        elif 600 <= id_array[num] <= 622:
             idImage_array[num] = os.path.join(path_theme, "13d@2x.gif")
-        elif 781 >= id_array[num] >= 701:
+        elif 701 <= id_array[num] <= 781:
             idImage_array[num] = os.path.join(path_theme, "50d@2x.gif")
         elif id_array[num] == 800:
             idImage_array[num] = os.path.join(path_theme, "01d@2x.gif")
@@ -416,7 +448,7 @@ def update_forecast():
             idImage_array[num] = os.path.join(path_theme, "02d@2x.gif")
         elif id_array[num] == 802:
             idImage_array[num] = os.path.join(path_theme, "03d@2x.gif")
-        elif id_array[num] == 803 or id_array[num] == 804:
+        elif 803 <= id_array[num] <= 804:
             idImage_array[num] = os.path.join(path_theme, "04d@2x.gif")
         else:
             logging.error("Invalid weather ID")
@@ -537,7 +569,10 @@ while running:
         m = int(time.strftime("%M"))
         s = int(time.strftime("%S"))
 
-        logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
+        if use_hour24:
+            logging.debug(f"{time.strftime("%H")}:{str(m)}:{str(s)}")
+        else:
+            logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
 
         needUpdate = False
         if (needUpdate1):
@@ -625,7 +660,7 @@ while running:
         pen.clear()
 
     except KeyboardInterrupt:
-        print("Exiting WeatherClock.")
+        logging.info("Exiting WeatherClock.")
         exit(0)
 
 # if you don't do this, window will open and close immediately, should be the last line of your program
