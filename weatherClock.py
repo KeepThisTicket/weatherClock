@@ -7,12 +7,26 @@ import json
 import logging
 import sys
 import os
+import locale
 import getopt
 from datetime import datetime, timedelta
-from pynput.keyboard import Key
-from pynput.keyboard import Controller as KController
-from pynput.mouse import Button
-from pynput.mouse import Controller as MController
+try:
+    from pynput.keyboard import Key
+    from pynput.keyboard import Controller as KController
+    from pynput.mouse import Button
+    from pynput.mouse import Controller as MController
+except ImportError:
+    print("Install python 'pynput' module")
+import gettext
+#from gettext import gettext
+#from gettext import dgettext #Can't use because it don't generate lose error.pot/ logging.pot files
+# set current language default to english USA
+lang_translations = gettext.translation('messages', localedir='locales', languages=['en_US'])
+lang_translations.install()
+# define _() shortcut for translations
+_ = lang_translations.gettext
+#_d = dgettext
+#print(locale("nl"))
 
 keyboard = KController()
 mouse = MController()
@@ -23,16 +37,17 @@ mouse.position = (0, 0)
 path = os.path.dirname(os.path.realpath(__file__))
 
 
-print("Starting WeatherClock...")
+print(_("Starting WeatherClock..."))
 try:
     options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', [
         "apikey=", "loglevel=", "latitude=", "longitude=" "help"])
     if remaining:
-        print(f"Remaining arguments will not be used:{remaining}")
+        print(_("Remaining arguments will not be used: {0}").format(remaining))
     if options:
-        print(f"Options: {options}")
+        print(_("Options: {0}").format(options))
     api_key = False
     theme = "default"
+    language = "en_US"
     log_level = False
     latitude = False
     longitude = False
@@ -52,7 +67,7 @@ try:
     weather_text_data_font_size = 19
     hourly_touch_size = 50
     radius = 265
-    wn_title = "WeatherClock 0.0.0"
+    wn_title = _("WeatherClock") + "\n0.0.0"
     divider_start = -125
     divider_end = 275
     hour_hand = 100
@@ -78,15 +93,21 @@ try:
             if arg.lower() in ['metric', 'imperial']:
                 units = arg
             else:
-                raise ValueError("[-u|--units] must be one of: metric, imperial")
+                #raise ValueError('[-u|--units] ' + _d('error', 'must be one of:') + "metric, imperial")
+                raise ValueError('[-u|--units] ' + _("must be one of:") + "metric, imperial")
         elif opt in ['-h', '--help']:
-            print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
+            #logging.error(_d("logging",'usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
+            logging.error(_('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
+            #print(_d("logging",'usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
+            print(_('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
             exit(0)
         else:
             print(f"Parameter unused: {opt}={arg}")
 except getopt.GetoptError:
-    print('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]')
-    raise ValueError("Missing one or more parameters.")
+    #print(_d("logging",'usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
+    print(_('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
+    #raise ValueError(_d("error","Missing one or more parameters."))
+    raise ValueError(_("Missing one or more parameters."))
 
 try:
     with open('settings.json', 'r') as settings_json:
@@ -107,6 +128,7 @@ try:
             temperature_values = settings.get('TemperatureValues').lower() in ['1', 'true']
         if not wind_values:
             wind_values = settings.get('WindValues').lower() in ['1', 'true']
+        language = settings.get('Language')
         values_color = settings.get('ValuesColor')
         global_x_shift = int(settings.get('GlobalXShift'))
         global_y_shift = int(settings.get('GlobalYShift'))
@@ -136,10 +158,12 @@ try:
         wind_text_no_measure_text = settings.get('WindTextNoMeasureText').lower() in ['1', 'true']
         
 except FileNotFoundError:
-    print("'settings.json' file not found. Using command line parameters.")
+    #print(_d("error","'settings.json' file not found. Using command line parameters."))
+    print(_("'settings.json' file not found. Using command line parameters."))
 
 if not api_key:
-    raise ValueError("No ApiKey given. Use ApiKey in settings.json or use parameter: [-a|--apikey].")
+    #raise ValueError(_d("error","No ApiKey given. Use ApiKey in settings.json or use parameter: [-a|--apikey]."))
+    raise ValueError(_("No ApiKey given. Use ApiKey in settings.json or use parameter: [-a|--apikey]."))
 
 if log_level.lower() == 'debug':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
@@ -150,15 +174,28 @@ elif log_level.lower() == 'warn' or log_level.lower() == 'warning':
 elif log_level.lower() == 'error':
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.ERROR)
 else:
-    logging.error(f"Log Level set to invalid value: {log_level}")
-    raise ValueError("LogLevel (--loglevel) must be one of: [Debug|Info|Information|Warn|Warning|Error]")
+    #logging.error(_d("logging","Log Level set to invalid value: {0}").format(log_level))
+    logging.error(_("Log Level set to invalid value: {0}").format(log_level))
+    #raise ValueError(_d("error","LogLevel (--loglevel) must be one of: ") + "[Debug|Info|Information|Warn|Warning|Error]")
+    raise ValueError("LogLevel (--loglevel) " + _("must be one of:") + " [Debug|Info|Information|Warn|Warning|Error]")
+
+language_list = ['en_US','en_GB','nl_NL','de_DE']
+for l in language_list:
+    if l.lower() == language.lower():
+        logging.info(_("Language changed to {0}").format(l))
+        lang_translations = gettext.translation('messages', localedir='locales', languages=[l])
+        lang_translations.install()
+        _ = lang_translations.gettext
+        logging.info(_("Language changed to {0}").format(l))
+        £locale.setlocale(locale.LC_ALL, locale.normalize(l))
+del language_list
 
 
 url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}'
 if units:
     url_params += f"&units={units}"
 else:
-    logging.info(f"Units not set. OpenWeatherMap.org defaults to 'standard'.")
+    logging.info("Units not set. OpenWeatherMap.org defaults to 'standard'.")
 url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
 weatherUpdatePeriod = 10
@@ -230,7 +267,8 @@ def get_mouse_click_coordinate(x, y):
 
     cursor_x = x
     cursor_y = y
-    logging.debug("cursor pressed: x, y")
+    #logging.debug(_d("logging","cursor pressed: x, y"))
+    logging.debug(_("cursor pressed: x, y"))
     logging.debug(cursor_x, cursor_y)
 
     hour_cursor = int(time.strftime("%I"))
@@ -243,7 +281,8 @@ def get_mouse_click_coordinate(x, y):
             hour_touched = i + 1
     tomorrow_date = None
     if hour_touched >= 0:
-        logging.debug(f"hour {hour_touched} WAS TOUCHED !")
+        #logging.debug(_d("logging","hour {0} WAS TOUCHED !").format(str(hour_touched)))
+        logging.debug(_("hour {0} WAS TOUCHED !").format(str(hour_touched)))
 
         if hour_touched < hour_cursor and not hour_cursor == 12:
             hours_ahead = 12-hour_cursor+hour_touched
@@ -259,7 +298,8 @@ def get_mouse_click_coordinate(x, y):
                 hours_ahead = hour_touched - hour_cursor
             touched_meridiem = current_meridiem
         if hours_ahead >= 0:
-            logging.info(f"Touched hour is {str(hours_ahead)} hours ahead")
+            #logging.info(_d("logging","Touched hour is {0} hours ahead").format(str(hours_ahead)))
+            logging.info(_("Touched hour is {0} hours ahead").format(str(hours_ahead)))
 
     if mode == 0 and hour_touched != -1:
         # go to hourly detail mode
@@ -275,7 +315,7 @@ def get_mouse_click_coordinate(x, y):
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.color("white")
         # day of the week
-        weatherText.write("Day", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("Day"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         if not tomorrow_date:
@@ -287,7 +327,7 @@ def get_mouse_click_coordinate(x, y):
 
         # hour of the day
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
-        weatherText.write("hour", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("Hour"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         weatherText.write(str(hour_touched) + " " + touched_meridiem,
@@ -295,7 +335,7 @@ def get_mouse_click_coordinate(x, y):
 
         # temperature
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing + global_y_shift)
-        weatherText.write("temp", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("Temp"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing + global_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hours_ahead]["temp"], 1)) + degree_sign,
@@ -303,16 +343,16 @@ def get_mouse_click_coordinate(x, y):
 
         # Feels like
         weatherText.goto(weather_text_description + global_x_shift, global_y_shift)
-        weatherText.write("Feels like", align="right",
+        weatherText.write(_("Feels like"), align="right",
                           font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, global_y_shift)
         weatherText.write(str(round_half_up(data["hourly"][hours_ahead]["feels_like"], 1)) + degree_sign,
                           align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
-        # POP
+        # POP - Probability of precipitation
         weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing + global_y_shift)
-        weatherText.write("POP", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("POP"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing + global_y_shift)
         weatherText.write(str(int(data["hourly"][hours_ahead]["pop"]*100)) + " %",
@@ -320,7 +360,7 @@ def get_mouse_click_coordinate(x, y):
 
         # Rain
         weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing * 2 + global_y_shift)
-        weatherText.write("Rain", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("Rain"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing * 2 + global_y_shift)
         if 'rain' not in data["hourly"][hours_ahead]:
@@ -331,7 +371,7 @@ def get_mouse_click_coordinate(x, y):
 
         # Wind
         weatherText.goto(weather_text_description + global_x_shift, -weather_text_vert_spacing * 3 + global_y_shift)
-        weatherText.write("Wind", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
+        weatherText.write(_("Wind"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, -weather_text_vert_spacing * 3 + global_y_shift)
         weatherText.write(str(data["hourly"][hours_ahead]["wind_speed"]) + " km/h",
@@ -374,20 +414,29 @@ def update_forecast():
 
     for num in range(12):
         # current hour
-        logging.debug("current hour: " + str(hour_cursor) + " " + meridiem)
+        #logging.debug(_d("logging","current hour: ") + str(hour_cursor) + " " + meridiem)
+        logging.debug(_("current hour: ") + str(hour_cursor) + " " + meridiem)
         # forecast hour
-        logging.debug("forecast hour: " + str(int(hour_cursor)+num))
-        logging.debug("temperature: " + str(data["hourly"][num]["temp"]))
-        logging.debug("feels like: " + str(data["hourly"][num]["feels_like"]))
-        logging.debug("wind speed: " + str(data["hourly"][num]["wind_speed"]))
+        #logging.debug(_d("logging","forecast hour: ") + str(int(hour_cursor)+num))
+        logging.debug(_("forecast hour: ") + str(int(hour_cursor)+num))
+        #logging.debug(_d("logging","temperature: ") + str(data["hourly"][num]["temp"]))
+        logging.debug(_("temperature: ") + str(data["hourly"][num]["temp"]))
+        #logging.debug(_d("logging","feels like: ") + str(data["hourly"][num]["feels_like"]))
+        logging.debug(_("feels like: ") + str(data["hourly"][num]["feels_like"]))
+        #logging.debug(_d("logging","wind speed: ") + str(data["hourly"][num]["wind_speed"]))
+        logging.debug(_("wind speed: ") + str(data["hourly"][num]["wind_speed"]))
         logging.debug(data["hourly"][num]["weather"][0]["description"])
-        logging.debug("weather ID: " + str(data["hourly"][num]["weather"][0]["id"]))
-        logging.debug("POP: " + str(data["hourly"][num]["pop"]))
+        #logging.debug(_d("logging","weather ID: ") + str(data["hourly"][num]["weather"][0]["id"]))
+        logging.debug(_("weather ID: ") + str(data["hourly"][num]["weather"][0]["id"]))
+        #logging.debug(_d("logging","POP: ") + str(data["hourly"][num]["pop"]))
+        logging.debug(_("POP: ") + str(data["hourly"][num]["pop"]))
 
         if 'rain' not in data["hourly"][num]:
-            logging.debug("no rain data")
+            #logging.debug(_d("logging","no rain data"))
+            logging.debug(_("no rain data"))
         else:
-            logging.debug("rain: " + str(data["hourly"][num]["rain"]))
+            #logging.debug(_d("logging","Rain: ") + str(data["hourly"][num]["rain"]))
+            logging.debug(_("Rain: ") + str(data["hourly"][num]["rain"]))
 
         temp_array[num] = data["hourly"][num]["temp"]
         temp_feel_array[num] = data["hourly"][num]["feels_like"]
@@ -419,7 +468,8 @@ def update_forecast():
         elif id_array[num] == 803 or id_array[num] == 804:
             idImage_array[num] = os.path.join(path_theme, "04d@2x.gif")
         else:
-            logging.error("Invalid weather ID")
+            #logging.error(_d("error","Invalid weather ID"))
+            logging.error(_("Invalid weather ID"))
 
     logging.debug(temp_array)
     logging.debug(id_array)
@@ -529,9 +579,11 @@ wn.listen()
 
 needUpdate1 = True    
 
+#def main():
 while running:
     try:
-        logging.debug("\n... Main Loop Start ...\n")
+        #logging.debug(_d("logging","\n... Main Loop Start ...\n"))
+        logging.debug(_("\n... Main Loop Start ...\n"))
 
         h = int(time.strftime("%I"))
         m = int(time.strftime("%M"))
@@ -548,14 +600,15 @@ while running:
         if m % weatherUpdatePeriod == 0 and s == 0:
             res = requests.get(url)
             data = res.json()
-            logging.debug("** FETCHED NEW DATA **")
+            #logging.debug(_d("logging","** FETCHED NEW DATA **"))
+            logging.debug(_("** FETCHED NEW DATA **"))
             needUpdate = True
 
         if mode == 0:
             draw_clock(h, m, s, pen)
             update_forecast()
 
-            logging.debug(f"hour_cursor: {str(hour_cursor)}")
+            logging.debug(f"hour_cursor: {hour_cursor}")
             
             for i in range(1, 13):
                 if (i - hour_cursor < 0):
@@ -614,20 +667,28 @@ while running:
         # cursor / touch logic
         # this returns the coordinate of the press !
         turtle.onscreenclick(get_mouse_click_coordinate)
-        logging.debug("MODE:" + str(mode))
+        #logging.debug(_d("logging","MODE: ") + str(mode))
+        logging.debug(_("MODE: ") + str(mode))
         logging.debug("cursor_x: " + str(cursor_x) + "; cursor_y: " + str(cursor_y))
 
         if cursor_x != -1 and cursor_y != -1:
-            logging.debug("screen was touched")
+            #logging.debug(_d("logging","screen was touched"))
+            logging.debug(_("screen was touched"))
 
         time.sleep(1)
 
         pen.clear()
 
     except KeyboardInterrupt:
-        print("Exiting WeatherClock.")
+        print(_("Exiting WeatherClock."))
         exit(0)
 
 # if you don't do this, window will open and close immediately, should be the last line of your program
 # this line is technically unreachable code since the above while loop also closes the script.
 # wn.mainloop()
+
+# if __name__=="__main__":
+#     logging.debug(_d("logging","weatherClock.py is running directly"))
+#     main()
+# else:
+#     logging.debug(_d("logging","weatherClock.py is being imported"))
