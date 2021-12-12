@@ -52,6 +52,7 @@ try:
     units = False
     temperature_values = False 
     wind_values = False
+    use_hour24 = False
     values_color = "gray"
     global_x_shift = 0
     global_y_shift = 0
@@ -187,7 +188,7 @@ for l in language_list:
         lang_translations.install()
         _ = lang_translations.gettext
         logging.info(_("Language changed to {0}").format(l))
-        £locale.setlocale(locale.LC_ALL, locale.normalize(l))
+        locale.setlocale(locale.LC_ALL, locale.normalize(l))
 del language_list
 
 
@@ -200,6 +201,10 @@ url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
 ini_done = False
 weatherUpdatePeriod = 10
+current_hour12 = 0
+current_hour24 = 0
+current_meridiem = ""
+tomorrow_date = datetime.today() + timedelta(days=1)
 
 temp_array = [0] * 12
 temp_feel_array = [0] * 12
@@ -210,7 +215,6 @@ wind_array_was = [0] * 12
 id_array = [0] * 12
 idImage_array = [""] * 12
 idImage_array_was = [""] * 12
-hour_cursor = int(time.strftime('%I'))
 
 res = requests.get(url)
 if res.ok:
@@ -264,16 +268,12 @@ def get_mouse_click_coordinate(x, y):
     global cursor_y
     # 0 = clock, 1 = hourly detail
     global mode
-    global hour_cursor
-
+ 
     cursor_x = x
     cursor_y = y
     #logging.debug(_d("logging","cursor pressed: x, y"))
     logging.debug(_("cursor pressed: x, y"))
     logging.debug(cursor_x, cursor_y)
-
-    hour_cursor = int(time.strftime("%I"))
-    current_meridiem = str(time.strftime('%p'))
 
     hour_touched = -1
 
@@ -281,27 +281,27 @@ def get_mouse_click_coordinate(x, y):
         if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
             hour_touched = i + 1
             break
-    tomorrow_date = None
     if hour_touched >= 0:
         #logging.debug(_d("logging","hour {0} WAS TOUCHED !").format(str(hour_touched)))
         logging.debug(_("hour {0} WAS TOUCHED !").format(str(hour_touched)))
-
-        if hour_touched < hour_cursor and not hour_cursor == 12:
-            hours_ahead = 12-hour_cursor+hour_touched
+        
+        tomorrow = False
+        if hour_touched < current_hour12 and not current_hour12 == 12:
+            hours_ahead = 12-current_hour12+hour_touched
             if current_meridiem == "PM":
-                tomorrow_date = datetime.today() + timedelta(days=1)
+                tomorrow = True
                 touched_meridiem = "AM"
             else:
                 touched_meridiem = "PM"
         else:
             touched_meridiem = current_meridiem
-            if hour_cursor == 12:
+            if current_hour12 == 12:
                 hours_ahead = hour_touched
             else:
-                hours_ahead = hour_touched - hour_cursor
+                hours_ahead = hour_touched - current_hour12
                 if hour_touched == 12:
                     if current_meridiem == "PM":
-                        tomorrow_date = datetime.today() + timedelta(days=1)
+                        tomorrow = True
                         touched_meridiem = "AM"
                     else:
                         touched_meridiem = "PM"
@@ -328,7 +328,7 @@ def get_mouse_click_coordinate(x, y):
         weatherText.write(_("Day"), align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
-        if not tomorrow_date:
+        if not tomorrow:
             weatherText.write(datetime.today().strftime('%A'),
                               align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
@@ -423,22 +423,14 @@ def get_mouse_click_coordinate(x, y):
 
 def update_forecast():
 
-    global hour_cursor
-
     # weather ID breakdown https://openweathermap.org/weather-conditions
     # use https://ezgif.com/maker for gif conversion
 
     logging.debug("---- update_forecast() ----")
 
-    hour_cursor = int(time.strftime("%I"))
-    meridiem = time.strftime('%p')
-
-    logging.debug("hour_cursor: " + str(hour_cursor))
-
     for num in range(12):
  
         if use_hour24:
-            current_hour24 = int(time.strftime("%H"))
             #logging.debug(_d("logging","current hour: ") + str(current_hour24)) # current hour 24
             logging.debug(_("current hour: ") + str(current_hour24)) # current hour 24
             if current_hour24 + num < 24:
@@ -448,10 +440,10 @@ def update_forecast():
                 #logging.debug(_d("logging","forecast hour: ") + str(current_hour24+num-24)) # forecast hour 24
                 logging.debug(_("forecast hour: ") + str(current_hour24+num-24)) # forecast hour 24
         else:
-            #logging.debug(_d("logging","current hour: ") + str(hour_cursor) + " " + meridiem)
-            logging.debug(_("current hour: ") + str(hour_cursor) + " " + meridiem)
-            #logging.debug(_d("logging","forecast hour: ") + str(int(hour_cursor)+num))
-            logging.debug(_("forecast hour: ") + str(int(hour_cursor)+num))
+            #logging.debug(_d("logging","current hour: ") + str(current_hour12) + " " + current_meridiem)
+            logging.debug(_("current hour: ") + str(current_hour12) + " " + current_meridiem)
+            #logging.debug(_d("logging","forecast hour: ") + str(int(current_hour12)+num))
+            logging.debug(_("forecast hour: ") + str(int(current_hour12)+num))
 
         #logging.debug(_d("logging","temperature: ") + str(data["hourly"][num]["temp"]))
         logging.debug(_("temperature: ") + str(data["hourly"][num]["temp"]))
@@ -611,12 +603,10 @@ top_window.protocol("WM_DELETE_WINDOW", on_close)
 top_window.overrideredirect(True)
 wn.listen()
 
-needUpdate1 = True    
-
 #def main():
 while running:
     try:
-        if ini_done == False
+        if ini_done == False:
             #logging.debug(_d("logging","\n... Main Loop Start ...\n"))
             logging.debug(_("\n... Main Loop Start ...\n"))
 
@@ -624,42 +614,40 @@ while running:
         if s == 0 or ini_done == False:
             m = int(time.strftime("%M"))
         if m == 0 or ini_done == False:
-            h = int(time.strftime("%I"))
+            current_hour12 = int(time.strftime("%I"))
+            current_hour24 = int(time.strftime("%H"))
+            current_meridiem = time.strftime('%p')
+            h = current_hour12
+            tomorrow_date = datetime.today() + timedelta(days=1)
 
         if use_hour24:
-            logging.debug(f"{time.strftime("%H")}:{str(m)}:{str(s)}")
+            logging.debug(f"{str(current_hour24)}:{str(m)}:{str(s)}")
         else:
-            logging.debug(f"{str(h)}:{str(m)}:{str(s)}")
+            logging.debug(f"{str(current_hour12)}:{str(m)}:{str(s)} " + current_meridiem)
 
-        needUpdate = False
-        if (needUpdate1):
-            needUpdate = True
-            needUpdate1 = False
-        
         # every x minutes, fetch new weather data
         if (m % weatherUpdatePeriod == 0 and s == 0) or ini_done == False:
             res = requests.get(url)
             data = res.json()
             #logging.debug(_d("logging","** FETCHED NEW DATA **"))
             logging.debug(_("** FETCHED NEW DATA **"))
-            needUpdate = True
             update_forecast()
 
         if mode == 0:
             draw_clock(h, m, s, pen)
 
-            logging.debug(f"hour_cursor: {hour_cursor}")
+            logging.debug(f"current_hour12: {current_hour12}")
             
             for i in range(1, 13):
-                if (i - hour_cursor < 0):
-                    j = 12 - abs(i - hour_cursor)
+                if (i - current_hour12 < 0):
+                    j = 12 - abs(i - current_hour12)
                 else:
-                    j = i - hour_cursor
+                    j = i - current_hour12
                 if(idImage_array[j] != idImage_array_was[j]):
                     bg_hour[i-1].shape(idImage_array[j])
                     idImage_array_was[j] = idImage_array[j]
                     
-                if ((needUpdate) or (temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
+                if ((temp_array[j] != temp_array_was[j]) or (temp_feel_array[j] != temp_feel_array_was[j]) or
                         (wind_array[j] != wind_array_was[j])):
                     if (temperature_values):
                         bg_hourtext[i-1].clear()
