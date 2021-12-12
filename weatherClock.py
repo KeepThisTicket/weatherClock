@@ -198,6 +198,7 @@ else:
     logging.info("Units not set. OpenWeatherMap.org defaults to 'standard'.")
 url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
+ini_done = False
 weatherUpdatePeriod = 10
 
 temp_array = [0] * 12
@@ -615,12 +616,15 @@ needUpdate1 = True
 #def main():
 while running:
     try:
-        #logging.debug(_d("logging","\n... Main Loop Start ...\n"))
-        logging.debug(_("\n... Main Loop Start ...\n"))
+        if ini_done == False
+            #logging.debug(_d("logging","\n... Main Loop Start ...\n"))
+            logging.debug(_("\n... Main Loop Start ...\n"))
 
-        h = int(time.strftime("%I"))
-        m = int(time.strftime("%M"))
         s = int(time.strftime("%S"))
+        if s == 0 or ini_done == False:
+            m = int(time.strftime("%M"))
+        if m == 0 or ini_done == False:
+            h = int(time.strftime("%I"))
 
         if use_hour24:
             logging.debug(f"{time.strftime("%H")}:{str(m)}:{str(s)}")
@@ -633,16 +637,16 @@ while running:
             needUpdate1 = False
         
         # every x minutes, fetch new weather data
-        if m % weatherUpdatePeriod == 0 and s == 0:
+        if (m % weatherUpdatePeriod == 0 and s == 0) or ini_done == False:
             res = requests.get(url)
             data = res.json()
             #logging.debug(_d("logging","** FETCHED NEW DATA **"))
             logging.debug(_("** FETCHED NEW DATA **"))
             needUpdate = True
+            update_forecast()
 
         if mode == 0:
             draw_clock(h, m, s, pen)
-            update_forecast()
 
             logging.debug(f"hour_cursor: {hour_cursor}")
             
@@ -710,6 +714,8 @@ while running:
         if cursor_x != -1 and cursor_y != -1:
             #logging.debug(_d("logging","screen was touched"))
             logging.debug(_("screen was touched"))
+
+        ini_done = True
 
         time.sleep(1)
 
