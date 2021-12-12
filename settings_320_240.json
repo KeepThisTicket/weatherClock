@@ -9,6 +9,7 @@
   "Units": "metric",
   "TemperatureValues": "True", 
   "WindValues": "True", 
+  "UseHour24": "False",
   "ValuesColor": "gray",
   "GlobalXShift": "-32",
   "GlobalYShift": "5",
