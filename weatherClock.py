@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 try:
     from pynput.keyboard import Key
     from pynput.keyboard import Controller as KController
-    from pynput.mouse import Button
+    #from pynput.mouse import Button # not used
     from pynput.mouse import Controller as MController
 except ImportError:
     print("Install python 'pynput' module")
@@ -38,18 +38,18 @@ path = os.path.dirname(os.path.realpath(__file__))
 print(_("Starting WeatherClock..."))
 try:
     options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', [
-        "apikey=", "loglevel=", "latitude=", "longitude=" "help"])
+        "apikey=", "loglevel=", "latitude=", "longitude=", "help"])
     if remaining:
         print(_("Remaining arguments will not be used: {0}").format(remaining))
     if options:
         print(_("Options: {0}").format(options))
-    api_key = False
+    api_key = None
     theme = "default"
     language = "en_US"
-    log_level = False
-    latitude = False
-    longitude = False
-    units = False
+    log_level = None
+    latitude = None
+    longitude = None
+    units = "metric"
     temperature_values = False 
     wind_values = False
     use_hour24 = False
@@ -156,7 +156,7 @@ try:
         second_color = settings.get('SecondColor')
         wind_text_left_shift = int(settings.get('WindTextLeftShift'))
         wind_text_right_shift = int(settings.get('WindTextRightShift'))
-        wind_text_no_measure_text = settings.get('WindTextNoMeasureText').lower() in ['1', 'true']
+        wind_text_no_measure_text = settings.get('WindTextNoMeasureText').lower() in ['1', 'true', 'on']
         
 except FileNotFoundError:
     #print(_d("error","'settings.json' file not found. Using command line parameters."))
@@ -183,13 +183,35 @@ else:
 language_list = ['en_US','en_GB','nl_NL','de_DE']
 for l in language_list:
     if l.lower() == language.lower():
+        # Change i18n translation language
         logging.info(_("Language changed to {0}").format(l))
         lang_translations = gettext.translation('messages', localedir='locales', languages=[l])
         lang_translations.install()
         _ = lang_translations.gettext
         logging.info(_("Language changed to {0}").format(l))
-        locale.setlocale(locale.LC_ALL, locale.normalize(l))
-del language_list
+        
+        # Get current language
+        ext = "UTF-8"
+        lang, enc = locale.getlocale()
+        if lang == None:
+            lang, enc = locale.getdefaultlocale()
+        lang = lang or 'en_US'
+        enc = enc or ext
+        lang_now = locale.normalize(".".join((lang, enc)))
+        
+        # Try to set system settings to new language
+        lang_new = locale.normalize(".".join((l, ext)))
+        if lang_new != lang_now:
+            try:
+                #locale.setlocale(locale.LC_ALL, '')
+                locale.setlocale(locale.LC_ALL, locale.normalize(".".join((l, ext))))
+            except locale.Error:
+                logging.error(_("Failed to change system language."))
+                logging.error(_("Make sure locale '" + str(l) + ".UTF8' is generated on your system" ))
+                locale.setlocale(locale.LC_ALL, None)
+                continue
+        break #exit for loop
+del language_list, lang, enc, ext, lang_now, lang_new
 
 
 url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}'
@@ -225,8 +247,8 @@ else:
 
 logging.debug(data)
 
-cursor_x = 0
-cursor_y = 0
+cursor_x = -1
+cursor_y = -1
 
 weatherText = turtle.Turtle()
 weatherText.hideturtle()
@@ -273,7 +295,7 @@ def get_mouse_click_coordinate(x, y):
     cursor_y = y
     #logging.debug(_d("logging","cursor pressed: x, y"))
     logging.debug(_("cursor pressed: x, y"))
-    logging.debug(cursor_x, cursor_y)
+    logging.debug(f'{cursor_x}, {cursor_y}')
 
     hour_touched = -1
 
@@ -286,28 +308,20 @@ def get_mouse_click_coordinate(x, y):
         logging.debug(_("hour {0} WAS TOUCHED !").format(str(hour_touched)))
         
         tomorrow = False
+        touched_meridiem = current_meridiem
         if hour_touched < current_hour12 and not current_hour12 == 12:
             hours_ahead = 12-current_hour12+hour_touched
-            if current_meridiem == "PM":
-                tomorrow = True
-                touched_meridiem = "AM"
-            else:
-                touched_meridiem = "PM"
         else:
-            touched_meridiem = current_meridiem
             if current_hour12 == 12:
                 hours_ahead = hour_touched
             else:
                 hours_ahead = hour_touched - current_hour12
-                if hour_touched == 12:
-                    if current_meridiem == "PM":
-                        tomorrow = True
-                        touched_meridiem = "AM"
-                    else:
-                        touched_meridiem = "PM"
         if hours_ahead >= 0:
             #logging.info(_d("logging","Touched hour is {0} hours ahead").format(str(hours_ahead)))
             logging.info(_("Touched hour is {0} hours ahead").format(str(hours_ahead)))
+            touched_meridiem = (datetime.today() + timedelta(hours=hours_ahead)).strftime("%p")
+            if current_meridiem == "PM" and touched_meridiem == "AM":
+                tomorrow = True
 
     if hour_touched != -1:
         if mode == 1:
@@ -341,7 +355,7 @@ def get_mouse_click_coordinate(x, y):
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         if use_hour24:
-            current_hour24 = int(time.strftime("%H"))
+													 
             if current_hour24 + hours_ahead > 23:
                 if hour_touched == 12:
                     weatherText.write("0",
@@ -579,6 +593,8 @@ def draw_clock(hour, minute, second, pen):
     pen.rt(angle)
     pen.pendown()
     pen.fd(second_hand)
+    
+    return pen
 
 # makes the program fullscreen when you launch it
 keyboard.press(Key.alt)
@@ -634,7 +650,7 @@ while running:
             update_forecast()
 
         if mode == 0:
-            draw_clock(h, m, s, pen)
+            pen = draw_clock(h, m, s, pen)
 
             logging.debug(f"current_hour12: {current_hour12}")
             
@@ -672,20 +688,18 @@ while running:
                         v = int(round(temp_array[j]))
                         v2 = int(round(temp_feel_array[j]))
                         bg_hourtext[i-1].write(str(round(temp_array[j])), align="left", font=("Verdana", temperature_text_font_size, "bold"))
-                    if  (wind_values):   
+                    if (wind_values):   
+                        bg_windtext[i-1].clear()
+                        bg_windtext[i-1].penup()
+                        kmh = " km/h"
+                        if (wind_text_no_measure_text):
+                            kmh = ""
                         if (i in range(1,6)):
-                            bg_windtext[i-1].clear()
-                            bg_windtext[i-1].penup()
-                            kmh = " km/h"
-                            if (wind_text_no_measure_text):
-                                kmh = ""
                             bg_windtext[i-1].goto(hour_x[j] + temperature_text_horz_spacing +  x_shift + wind_text_right_shift + global_x_shift, hour_y[j] + temperature_text_vert_spacing + y_shift + global_y_shift)
                             bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="left", font=("Verdana", temperature_text_font_size, ""))
                         if (i in range(7,12)):
-                            bg_windtext[i-1].clear()
-                            bg_windtext[i-1].penup()
                             bg_windtext[i-1].goto(hour_x[j] + temperature_text_horz_spacing +  x_shift - wind_text_left_shift + global_x_shift, hour_y[j] + temperature_text_vert_spacing + y_shift + global_y_shift)
-                            bg_windtext[i-1].write(str(wind_array[j]), align="right", font=("Verdana", temperature_text_font_size, ""))
+                            bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="right", font=("Verdana", temperature_text_font_size, ""))
                 temp_array_was[j] = temp_array[j]
                 temp_feel_array_was[j] = temp_feel_array[j]
                 wind_array_was[j] = wind_array[j]                    
