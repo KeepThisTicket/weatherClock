@@ -36,6 +36,7 @@ mouse.position = (0, 0)
 path = os.path.dirname(os.path.realpath(__file__))
 
 print(_("Starting WeatherClock..."))
+#region Get command parameters and initialize tags
 try:
     options, remaining = getopt.getopt(sys.argv[1:], 'a:l:h', [
         "apikey=", "loglevel=", "latitude=", "longitude=", "help"])
@@ -107,7 +108,9 @@ except getopt.GetoptError:
     print(_('usage:\nweatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] [Debug|Info|Warn|Error]|]'))
     #raise ValueError(_d("error","Missing one or more parameters."))
     raise ValueError(_("Missing one or more parameters."))
+#endregion
 
+#region Get settings parameters
 try:
     with open('settings.json', 'r') as settings_json:
         settings = json.loads(settings_json.read())
@@ -161,6 +164,7 @@ try:
 except FileNotFoundError:
     #print(_d("error","'settings.json' file not found. Using command line parameters."))
     print(_("'settings.json' file not found. Using command line parameters."))
+#endregion
 
 if not api_key:
     #raise ValueError(_d("error","No ApiKey given. Use ApiKey in settings.json or use parameter: [-a|--apikey]."))
@@ -180,6 +184,7 @@ else:
     #raise ValueError(_d("error","LogLevel (--loglevel) must be one of: ") + "[Debug|Info|Information|Warn|Warning|Error]")
     raise ValueError("LogLevel (--loglevel) " + _("must be one of:") + " [Debug|Info|Information|Warn|Warning|Error]")
 
+#region Change language
 language_list = ['en_US','en_GB','nl_NL','de_DE']
 for l in language_list:
     if l.lower() == language.lower():
@@ -212,7 +217,7 @@ for l in language_list:
                 continue
         break #exit for loop
 del language_list, lang, enc, ext, lang_now, lang_new
-
+#endregion
 
 url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}'
 if units:
@@ -298,7 +303,7 @@ def get_mouse_click_coordinate(x, y):
     logging.debug(f'{cursor_x}, {cursor_y}')
 
     hour_touched = -1
-
+	#determines which hour was touched
     for i in range(0, 12):
         if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
             hour_touched = i + 1
@@ -323,6 +328,7 @@ def get_mouse_click_coordinate(x, y):
             if current_meridiem == "PM" and touched_meridiem == "AM":
                 tomorrow = True
 
+	# goto right mode (detail or not)
     if hour_touched != -1:
         if mode == 1:
             weatherText.clear()  # remove hourly details from screen
@@ -649,7 +655,7 @@ while running:
             logging.debug(_("** FETCHED NEW DATA **"))
             update_forecast()
 
-        if mode == 0:
+        if mode == 0: #clock
             pen = draw_clock(h, m, s, pen)
 
             logging.debug(f"current_hour12: {current_hour12}")
