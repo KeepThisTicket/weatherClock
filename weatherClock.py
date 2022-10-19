@@ -192,7 +192,13 @@ weatherText.hideturtle()
 weatherDividerPen = turtle.Turtle()
 weatherDividerPen.hideturtle()
 
-degree_sign = u"\N{DEGREE SIGN}"
+degree_sign = u" \N{DEGREE SIGN}"
+if units.lower() == "imperial":
+	degree_sign += "F"	#Fahrenheit
+elif units.lower() == "metric":
+	degree_sign += "C"	#Celsius
+else:
+	degree_sign += "K"	#Kelvin
 
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
