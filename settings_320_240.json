@@ -1,6 +1,7 @@
 {
   "ApiKey": "",
   "Theme": "default",
+  "Language": "en_US",
   "Title": "Vancouver, BC CANADA",
   "LogLevel": "Information",
   "Latitude": "49.2827",
@@ -8,6 +9,7 @@
   "Units": "metric",
   "TemperatureValues": "True", 
   "WindValues": "True", 
+  "UseHour24": "False",
   "ValuesColor": "gray",
   "GlobalXShift": "-32",
   "GlobalYShift": "5",
