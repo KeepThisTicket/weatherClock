@@ -16,6 +16,7 @@
   "WeatherTextDescription": "-30",
   "WeatherTextData": "30",
   "WeatherTextVertSpacing": "40",
+  "WeatherTextColor": "white",
   "TemperatureTextVertSpacing": "-9",
   "TemperatureTextHorzSpacing": "11",
   "TemperatureTextFontSize": "11",
