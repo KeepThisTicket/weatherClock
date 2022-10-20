@@ -60,7 +60,7 @@ try:
     weather_text_description = -30
     weather_text_data = 30
     weather_text_vert_spacing = 40
-	weather_text_color = "white"
+    weather_text_color = "white"
     temperature_text_vert_spacing = -9
     temperature_text_horz_spacing = 11
     temperature_text_font_size = 11
@@ -141,7 +141,7 @@ try:
         weather_text_data = int(settings.get('WeatherTextData'))
         weather_text_vert_spacing = int(settings.get('WeatherTextVertSpacing'))
         weather_text_color = settings.get('WeatherTextColor')
-		temperature_text_vert_spacing = int(settings.get('TemperatureTextVertSpacing'))
+        temperature_text_vert_spacing = int(settings.get('TemperatureTextVertSpacing'))
         temperature_text_horz_spacing = int(settings.get('TemperatureTextHorzSpacing'))
         temperature_text_font_size = int(settings.get('TemperatureTextFontSize'))
         weather_text_description_font_size = int(settings.get('WeatherTextDataFontSize'))
@@ -265,11 +265,11 @@ weatherDividerPen.hideturtle()
 
 degree_sign = u" \N{DEGREE SIGN}"
 if units.lower() == "imperial":
-	degree_sign += "F"	#Fahrenheit
+    degree_sign += "F"  #Fahrenheit
 elif units.lower() == "metric":
-	degree_sign += "C"	#Celsius
+    degree_sign += "C"  #Celsius
 else:
-	degree_sign += "K"	#Kelvin
+    degree_sign += "K"  #Kelvin
 
 # 1 - hourly detail mode, 0 - analog clock face mode
 mode = 0
@@ -311,7 +311,7 @@ def get_mouse_click_coordinate(x, y):
     logging.debug(f'{cursor_x}, {cursor_y}')
 
     hour_touched = -1
-	#determines which hour was touched
+    #determines which hour was touched
     for i in range(0, 12):
         if touch_in_box(cursor_x, cursor_y, hour_x[i], hour_y[i], hourly_touch_size, hourly_touch_size):
             hour_touched = i + 1
@@ -336,7 +336,7 @@ def get_mouse_click_coordinate(x, y):
             if current_meridiem == "PM" and touched_meridiem == "AM":
                 tomorrow = True
 
-	# goto right mode (detail or not)
+    # goto right mode (detail or not)
     if hour_touched != -1:
         if mode == 1:
             weatherText.clear()  # remove hourly details from screen
@@ -368,7 +368,7 @@ def get_mouse_click_coordinate(x, y):
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         if use_hour24:
-													 
+                                                     
             if current_hour24 + hours_ahead > 23:
                 if hour_touched == 12:
                     weatherText.write("0",
