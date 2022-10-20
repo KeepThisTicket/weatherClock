@@ -697,7 +697,7 @@ while running:
                             y_shift = -5
                         if (temp_array[j] < 10):
                             x_shift = x_shift + 4
-                        bg_hourtext[i-1].goto(hour_x[j] + temperature_text_horz_spacing + x_shift - 20 + global_x_shift, hour_y[j] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                        bg_hourtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing + x_shift - 20 + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
                         v = int(round(temp_array[j]))
                         v2 = int(round(temp_feel_array[j]))
                         bg_hourtext[i-1].write(str(round(temp_array[j])), align="left", font=("Verdana", temperature_text_font_size, "bold"))
@@ -708,10 +708,10 @@ while running:
                         if (wind_text_no_measure_text):
                             kmh = ""
                         if (i in range(1,6)):
-                            bg_windtext[i-1].goto(hour_x[j] + temperature_text_horz_spacing +  x_shift + wind_text_right_shift + global_x_shift, hour_y[j] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift + wind_text_right_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
                             bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="left", font=("Verdana", temperature_text_font_size, ""))
                         if (i in range(7,12)):
-                            bg_windtext[i-1].goto(hour_x[j] + temperature_text_horz_spacing +  x_shift - wind_text_left_shift + global_x_shift, hour_y[j] + temperature_text_vert_spacing + y_shift + global_y_shift)
+                            bg_windtext[i-1].goto(hour_x[i-1] + temperature_text_horz_spacing +  x_shift - wind_text_left_shift + global_x_shift, hour_y[i-1] + temperature_text_vert_spacing + y_shift + global_y_shift)
                             bg_windtext[i-1].write(str(wind_array[j]) + kmh, align="right", font=("Verdana", temperature_text_font_size, ""))
                 temp_array_was[j] = temp_array[j]
                 temp_feel_array_was[j] = temp_feel_array[j]
