@@ -45,6 +45,7 @@ try:
     weather_text_description = -30
     weather_text_data = 30
     weather_text_vert_spacing = 40
+	weather_text_color = "white"
     temperature_text_vert_spacing = -9
     temperature_text_horz_spacing = 11
     temperature_text_font_size = 11
@@ -113,7 +114,8 @@ try:
         weather_text_description = int(settings.get('WeatherTextDescription'))
         weather_text_data = int(settings.get('WeatherTextData'))
         weather_text_vert_spacing = int(settings.get('WeatherTextVertSpacing'))
-        temperature_text_vert_spacing = int(settings.get('TemperatureTextVertSpacing'))
+        weather_text_color = settings.get('WeatherTextColor')
+		temperature_text_vert_spacing = int(settings.get('TemperatureTextVertSpacing'))
         temperature_text_horz_spacing = int(settings.get('TemperatureTextHorzSpacing'))
         temperature_text_font_size = int(settings.get('TemperatureTextFontSize'))
         weather_text_description_font_size = int(settings.get('WeatherTextDataFontSize'))
@@ -273,7 +275,7 @@ def get_mouse_click_coordinate(x, y):
         weatherText.penup()
 
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
-        weatherText.color("white")
+        weatherText.color(weather_text_color)
         # day of the week
         weatherText.write("Day", align="right", font=("Verdana", weather_text_description_font_size, "bold"))
 
