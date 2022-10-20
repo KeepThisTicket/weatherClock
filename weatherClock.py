@@ -325,7 +325,7 @@ def get_mouse_click_coordinate(x, y):
         if hour_touched < current_hour12 and not current_hour12 == 12:
             hours_ahead = 12-current_hour12+hour_touched
         else:
-            if current_hour12 == 12:
+            if current_hour12 == 12 and not hour_touched == 12:
                 hours_ahead = hour_touched
             else:
                 hours_ahead = hour_touched - current_hour12
