@@ -1,0 +1,180 @@
+# German language of WeatherClock.
+# Copyright (C) 2021 Eli's weatherClock
+# FIRST AUTHOR: Vierlijner/Naglafarn, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-11-12 00:41+0100\n"
+"PO-Revision-Date: 2021-11-11 22:05+0100\n"
+"Last-Translator: Naglafarn\n"
+"Language: de_DE\n"
+"Language-Team: German Naglafarn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:37
+msgid "Starting WeatherClock..."
+msgstr "Anfangen WeatherClock..."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:42
+msgid "Remaining arguments will not be used: {0}"
+msgstr "Verbleibende Argumente werden nicht verwendet: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:44
+msgid "Options: {0}"
+msgstr "Optionen: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:67
+msgid "WeatherClock"
+msgstr "WeatherClock"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:94
+#: /home/pi/GitHub/weatherClock/weatherClock.py:177
+msgid "must be one of:"
+msgstr "muss einer von sein:"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:97
+#: /home/pi/GitHub/weatherClock/weatherClock.py:99
+#: /home/pi/GitHub/weatherClock/weatherClock.py:105
+msgid ""
+"usage:\n"
+"weatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] "
+"[Debug|Info|Warn|Error]|]"
+msgstr ""
+"Verwendungszweck:\n"
+"weatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] "
+"[Debug|Info|Warn|Error]|]"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:107
+msgid "Missing one or more parameters."
+msgstr "Es fehlen ein oder mehrere Parameter."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:159
+msgid "'settings.json' file not found. Using command line parameters."
+msgstr "'settings.json' nicht gefunden. Verwenden von Befehlszeilenparametern."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:163
+msgid ""
+"No ApiKey given. Use ApiKey in settings.json or use parameter: "
+"[-a|--apikey]."
+msgstr ""
+"Kein ApiKey angegeben. Verwenden Sie ApiKey in settings.json oder "
+"verwenden Sie parameter: [-a|--apikey]."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:175
+msgid "Log Level set to invalid value: {0}"
+msgstr "Protokollebene auf ungültigen Wert festgelegt: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:182
+msgid "Language changed to {0}"
+msgstr "Sprache in {0} geändert"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:264
+msgid "cursor pressed: x, y"
+msgstr "Cursor gedrückt: x, y"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:278
+msgid "hour {0} WAS TOUCHED !"
+msgstr "Stunde {0} wurde berührt!"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:295
+msgid "Touched hour is {0} hours ahead"
+msgstr "Berührte Stunde ist {0} Stunden voraus"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:311
+msgid "Day"
+msgstr "Tag"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:323
+msgid "Hour"
+msgstr "Uhrzeit"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:331
+msgid "Temp"
+msgstr "Temperatur"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:339
+msgid "Feels like"
+msgstr "Gefuehlt"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:348
+msgid "POP"
+msgstr "Regenchance"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:356
+msgid "Rain"
+msgstr "Regenmenge"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:367
+msgid "Wind"
+msgstr "Wind"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:411
+msgid "current hour: "
+msgstr "Aktuelle Stunde: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:414
+msgid "forecast hour: "
+msgstr "Prognosestunde: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:416
+msgid "temperature: "
+msgstr "Temperatur: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:418
+msgid "feels like: "
+msgstr "Gefuehlt: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:420
+msgid "wind speed: "
+msgstr "Windgeschwindigkeit: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:423
+msgid "weather ID: "
+msgstr "Wetter-ID: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:425
+msgid "POP: "
+msgstr "Regenchance: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:429
+msgid "no rain data"
+msgstr "Keine Regendaten"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:432
+msgid "Rain: "
+msgstr "Regenmenge: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:465
+msgid "Invalid weather ID"
+msgstr "Ungültige Wetter-ID"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:579
+msgid ""
+"\n"
+"... Main Loop Start ...\n"
+msgstr ""
+"\n"
+"... Start der Hauptschleife ...\n"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:597
+msgid "** FETCHED NEW DATA **"
+msgstr "** NEUE DATEN ABGERUFEN **"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:664
+msgid "MODE: "
+msgstr "MODUS: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:669
+msgid "screen was touched"
+msgstr "Bildschirm wurde berührt"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:676
+msgid "Exiting WeatherClock."
+msgstr "WeatherClock beenden."
+

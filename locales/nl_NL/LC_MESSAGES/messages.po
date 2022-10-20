@@ -1,0 +1,184 @@
+# Dutch language of WeatherClock.
+# Copyright (C) 2021 Eli's weatherClock
+# FIRST AUTHOR: Vierlijner, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-11-12 00:41+0100\n"
+"PO-Revision-Date: 2021-11-13 09:28+0100\n"
+"Last-Translator: Ronald Vierlijner\n"
+"Language: nl_NL\n"
+"Language-Team: Dutch Ronald Vierlijner\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:37
+msgid "Starting WeatherClock..."
+msgstr "Starten weerklok \"WeatherClock\"..."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:42
+msgid "Remaining arguments will not be used: {0}"
+msgstr "De volgende argumenten worden niet gebruikt: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:44
+msgid "Options: {0}"
+msgstr "Opties: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:67
+msgid "WeatherClock"
+msgstr "Weerklok"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:94
+#: /home/pi/GitHub/weatherClock/weatherClock.py:177
+msgid "must be one of:"
+msgstr "moet een van de volgende waardes zijn:"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:97
+#: /home/pi/GitHub/weatherClock/weatherClock.py:99
+#: /home/pi/GitHub/weatherClock/weatherClock.py:105
+msgid ""
+"usage:\n"
+"weatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] "
+"[Debug|Info|Warn|Error]|]"
+msgstr ""
+"Gebruik:\n"
+"weatherClock.py [-a|--apikey] <YourApiKey> [[-l|--loglevel] "
+"[Debug|Info|Warn|Error]|]"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:107
+msgid "Missing one or more parameters."
+msgstr "Mist een of meerdere parameters."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:159
+msgid "'settings.json' file not found. Using command line parameters."
+msgstr ""
+"'settings.json' file niet gevonden. Maak gebruik van commando lijn "
+"parameters."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:163
+msgid ""
+"No ApiKey given. Use ApiKey in settings.json or use parameter: "
+"[-a|--apikey]."
+msgstr ""
+"Geen ApiKey opgegeven. Vul ApiKey= in, in settings.json of gebruik "
+"commando parameter: [-a|--apikey]."
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:175
+msgid "Log Level set to invalid value: {0}"
+msgstr ""
+"Log Level met verkeerde waarde, maar gebuik van een van de volgende "
+"opties: {0}"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:182
+msgid "Language changed to {0}"
+msgstr "Taal in {0} gewijzigd"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:264
+msgid "cursor pressed: x, y"
+msgstr "cursor ingedrukt op coordinaat: x, y"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:278
+msgid "hour {0} WAS TOUCHED !"
+msgstr "Uur {0} is aangeklikt!"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:295
+msgid "Touched hour is {0} hours ahead"
+msgstr "Aangeklikte uur is {0} uur vooruit"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:311
+msgid "Day"
+msgstr "Dag"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:323
+msgid "Hour"
+msgstr "Uur"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:331
+msgid "Temp"
+msgstr "Temperatuur"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:339
+msgid "Feels like"
+msgstr "Voelt als"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:348
+msgid "POP"
+msgstr "Regenkans"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:356
+msgid "Rain"
+msgstr "Regen"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:367
+msgid "Wind"
+msgstr "Wind"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:411
+msgid "current hour: "
+msgstr "Huidige uur: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:414
+msgid "forecast hour: "
+msgstr "Voorspelde uur: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:416
+msgid "temperature: "
+msgstr "Temperatuur: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:418
+msgid "feels like: "
+msgstr "Voelt als: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:420
+msgid "wind speed: "
+msgstr "Wind snelheid: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:423
+msgid "weather ID: "
+msgstr "Weer ID: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:425
+msgid "POP: "
+msgstr "POP: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:429
+msgid "no rain data"
+msgstr "Geen regen data"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:432
+msgid "Rain: "
+msgstr "Regen: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:465
+msgid "Invalid weather ID"
+msgstr "Onbekende weer ID"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:579
+msgid ""
+"\n"
+"... Main Loop Start ...\n"
+msgstr ""
+"\n"
+"... Hoofdprogramma gestart ...\n"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:597
+msgid "** FETCHED NEW DATA **"
+msgstr "** NIEUWE DATA OPGEHAALD **"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:664
+msgid "MODE: "
+msgstr "MODE: "
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:669
+msgid "screen was touched"
+msgstr "Scherm aangeraakt"
+
+#: /home/pi/GitHub/weatherClock/weatherClock.py:676
+msgid "Exiting WeatherClock."
+msgstr "Afsluiten Weerklok."
+
