@@ -1,12 +1,25 @@
 #! /bin/bash
 
+#Get current path
 #full_path=$(realpath $0) 
 #dir_path=$(dirname $full_path)
-dir_path=$(pwd)
+dir_path=$PWD
 echo $dir_path
-dir_gettext=/home/pi/Python-3.10.0/Tools/i18n
-echo $dir_gettext
 
+#Search gettext
+pushd /home/
+dir_gettext=$(find -name "pygettext.py" -type f | head -n 1)    #/home/pi/Python-3.10.0/Tools/i18n
+echo $dir_gettext
+dir_gettext="$(dirname "$dir_gettext")" #remove filename
+echo $dir_gettext
+if [[ 0 != $? ]] || [[ -z $dir_gettext ]] ; then
+    echo "No gettext library found."
+    echo "Program Translate ends."
+    sleep 5s
+    exit 1
+fi
+popd    #cd $dir_path
+    
 # make pot file
 $dir_gettext/pygettext.py -a -p $dir_path/locales/ $dir_path/weatherClock.py
 echo "pot file generated"
