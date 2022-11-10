@@ -35,6 +35,7 @@ Terminal=true
 
 File 2: wClock.sh
 With the contents like this (script must be executable sh file):
+Or please use the script in the main folder
 
 ```
 cd  /home/plotn/github/weatherClock/
