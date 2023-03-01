@@ -233,7 +233,7 @@ weatherUpdatePeriod = 10
 current_hour12 = 0
 current_hour24 = 0
 current_meridiem = ""
-tomorrow_date = datetime.today() + timedelta(days=1)
+tomorrow_date = datetime.now() + timedelta(days=1)
 
 temp_array = [0] * 12
 temp_feel_array = [0] * 12
@@ -332,7 +332,7 @@ def get_mouse_click_coordinate(x, y):
         if hours_ahead >= 0:
             #logging.info(_d("logging","Touched hour is {0} hours ahead").format(str(hours_ahead)))
             logging.info(_("Touched hour is {0} hours ahead").format(str(hours_ahead)))
-            touched_meridiem = (datetime.today() + timedelta(hours=hours_ahead)).strftime("%p")
+            touched_meridiem = (current_dt + timedelta(hours=hours_ahead)).strftime("%p")
             if current_meridiem == "PM" and touched_meridiem == "AM":
                 tomorrow = True
 
@@ -356,7 +356,7 @@ def get_mouse_click_coordinate(x, y):
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 3 + global_y_shift)
         if not tomorrow:
-            weatherText.write(datetime.today().strftime('%A'),
+            weatherText.write(current_dt.strftime('%A'),
                               align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
             weatherText.write(tomorrow_date.strftime('%A'),
@@ -368,20 +368,11 @@ def get_mouse_click_coordinate(x, y):
 
         weatherText.goto(weather_text_data + global_x_shift, weather_text_vert_spacing * 2 + global_y_shift)
         if use_hour24:
-                                                     
-            if current_hour24 + hours_ahead > 23:
-                if hour_touched == 12:
-                    weatherText.write("0",
-                                    align="left", font=("Verdana", weather_text_data_font_size, "bold"))
-                else:
-                    weatherText.write(str(hour_touched),
-                                    align="left", font=("Verdana", weather_text_data_font_size, "bold"))
-            else:
-                weatherText.write(str(current_hour24 + hours_ahead),
-                                align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+            weatherText.write(str((current_dt + timedelta(hours=hours_ahead)).strftime("%H")),
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
         else:
             weatherText.write(str(hour_touched) + " " + touched_meridiem,
-                          align="left", font=("Verdana", weather_text_data_font_size, "bold"))
+                              align="left", font=("Verdana", weather_text_data_font_size, "bold"))
 
         # temperature
         weatherText.goto(weather_text_description + global_x_shift, weather_text_vert_spacing + global_y_shift)
@@ -592,7 +583,7 @@ def draw_clock(hour, minute, second, pen):
     pen.goto(global_x_shift, global_y_shift)
     pen.color(minute_color)
     pen.setheading(90)
-    angle = (minute / 60.0) * 360  # optional + (s/60) * 6
+    angle = (minute / 60.0) * 360  # optional + (second/60) * 6
     pen.rt(angle)
     pen.pendown()
     pen.fd(minute_hand)
@@ -639,15 +630,16 @@ while running:
             #logging.debug(_d("logging","\n... Main Loop Start ...\n"))
             logging.debug(_("\n... Main Loop Start ...\n"))
 
-        s = int(time.strftime("%S"))
+        current_dt = datetime.now()
+        s = int(current_dt.strftime("%S"))
         if s == 0 or ini_done == False:
-            m = int(time.strftime("%M"))
+            m = int(current_dt.strftime("%M"))
         if m == 0 or ini_done == False:
-            current_hour12 = int(time.strftime("%I"))
-            current_hour24 = int(time.strftime("%H"))
-            current_meridiem = time.strftime('%p')
+            current_hour12 = int(current_dt.strftime("%I"))
+            current_hour24 = int(current_dt.strftime("%H"))
+            current_meridiem = current_dt.strftime('%p')
             h = current_hour12
-            tomorrow_date = datetime.today() + timedelta(days=1)
+            tomorrow_date = current_dt + timedelta(days=1)
 
         if use_hour24:
             logging.debug(f"{str(current_hour24)}:{str(m)}:{str(s)}")
